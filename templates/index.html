@@ -1,0 +1,29 @@
+<!-- templates/index.html -->
+{% extends 'base.html' %}
+
+{% block title %}Home | Hostel Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row align-items-center">
+
+        <div class="col-md-6 text-white">
+            <h1 class="fw-bold display-4">Smart Hostel Management System</h1>
+            <p class="mt-3 fs-5 text-light">
+                Manage rooms, students, rent payments, complaints and visitor logs 
+                in one modern platform.
+            </p>
+
+            <div class="mt-4">
+                <a href="{% url 'register' %}" class="btn btn-info px-4 py-2 me-3">Get Started</a>
+                <a href="{% url 'login' %}" class="btn btn-outline-light px-4 py-2">Login</a>
+            </div>
+        </div>
+
+        <div class="col-md-6 text-center mt-4 mt-md-0">
+            <img src="https://cdn-icons-png.flaticon.com/512/1046/1046857.png" class="img-fluid" style="max-height:350px;">
+        </div>
+
+    </div>
+</div>
+{% endblock %}

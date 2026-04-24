@@ -1,0 +1,45 @@
+<!-- templates/register.html -->
+{% extends 'base.html' %}
+
+{% block title %}Register{% endblock %}
+
+{% block content %}
+<div class="card-box">
+    <h2>Create Account</h2>
+
+    <form method="POST">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <input type="text" name="first_name" class="form-control" placeholder="First Name">
+        </div>
+
+        <div class="mb-3">
+            <input type="text" name="last_name" class="form-control" placeholder="Last Name">
+        </div>
+
+        <div class="mb-3">
+            <input type="text" name="username" class="form-control" placeholder="Username">
+        </div>
+
+        <div class="mb-3">
+            <input type="email" name="email" class="form-control" placeholder="Email">
+        </div>
+
+        <div class="mb-3">
+            <input type="password" name="password" class="form-control" placeholder="Password">
+        </div>
+
+        <div class="mb-3">
+            <input type="password" name="confirm_password" class="form-control" placeholder="Confirm Password">
+        </div>
+
+        <button type="submit" class="btn btn-custom">Register</button>
+
+        <p class="text-center mt-3">
+            Already have an account?
+            <a href="{% url 'login' %}">Login</a>
+        </p>
+    </form>
+</div>
+{% endblock %}
