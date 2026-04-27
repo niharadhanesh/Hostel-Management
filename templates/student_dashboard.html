@@ -1,0 +1,47 @@
+<!-- templates/student_dashboard.html -->
+
+{% extends 'student_base.html' %}
+
+{% block title %}Student Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4 fw-bold">Student Dashboard</h2>
+
+<div class="row g-4">
+
+    <div class="col-md-4">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>My Room</h6>
+            <h2 class="fw-bold text-primary">A-203</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>Rent Status</h6>
+            <h2 class="fw-bold text-success">Paid</h2>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>Complaints</h6>
+            <h2 class="fw-bold text-danger">1</h2>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-5">
+    <div class="card shadow border-0 rounded-4 p-4">
+        <h5 class="mb-3">Latest Notices</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">Water supply maintenance tomorrow</li>
+            <li class="list-group-item">Rent due date is 5th of every month</li>
+            <li class="list-group-item">Mess timing updated</li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

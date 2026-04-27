@@ -1,0 +1,55 @@
+<!-- templates/admin_dashboard.html -->
+
+{% extends 'admin_base.html' %}
+
+{% block title %}Admin Dashboard{% endblock %}
+
+{% block content %}
+
+<h2 class="mb-4 fw-bold">Admin Dashboard</h2>
+
+<div class="row g-4">
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>Total Students</h6>
+            <h2 class="fw-bold text-primary">120</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>Total Rooms</h6>
+            <h2 class="fw-bold text-success">45</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>Pending Rent</h6>
+            <h2 class="fw-bold text-danger">18</h2>
+        </div>
+    </div>
+
+    <div class="col-md-3">
+        <div class="card shadow border-0 rounded-4 p-4 text-center">
+            <h6>Complaints</h6>
+            <h2 class="fw-bold text-warning">9</h2>
+        </div>
+    </div>
+
+</div>
+
+<div class="mt-5">
+    <div class="card shadow border-0 rounded-4 p-4">
+        <h5 class="mb-3">Recent Activities</h5>
+        <ul class="list-group list-group-flush">
+            <li class="list-group-item">New student registered</li>
+            <li class="list-group-item">Room 204 rent paid</li>
+            <li class="list-group-item">Complaint submitted for WiFi issue</li>
+            <li class="list-group-item">Visitor entry added</li>
+        </ul>
+    </div>
+</div>
+
+{% endblock %}

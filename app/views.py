@@ -1,8 +1,5 @@
 from django.shortcuts import render
 
-# Create your views here.
-# app/views.py
-
 from django.shortcuts import render, redirect
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
@@ -51,6 +48,11 @@ def register_page(request):
 
 
 # Login Page
+from django.contrib.auth import authenticate, login
+from django.shortcuts import render, redirect
+from django.contrib import messages
+
+
 def login_page(request):
     if request.method == "POST":
         username = request.POST.get('username')
@@ -60,16 +62,77 @@ def login_page(request):
 
         if user is not None:
             login(request, user)
-            messages.success(request, "Login successful")
-            return redirect('index')
+
+            # Super Admin Login
+            if user.is_superuser:
+                messages.success(request, "Admin Login Successful")
+                return redirect('admin_dashboard')
+
+            # Normal Student Login
+            else:
+                messages.success(request, "Student Login Successful")
+                return redirect('student_dashboard')
+
         else:
             messages.error(request, "Invalid username or password")
 
     return render(request, 'login.html')
 
 
-# Logout
+from django.contrib.auth import logout
+from django.shortcuts import redirect
+from django.contrib import messages
+
 def logout_page(request):
     logout(request)
     messages.success(request, "Logged out successfully")
     return redirect('login')
+
+from django.shortcuts import render
+
+def admin_dashboard(request):
+    return render(request, 'admin_dashboard.html')
+
+
+def student_dashboard(request):
+    return render(request, 'student_dashboard.html')
+
+# app/views.py
+
+# app/views.py
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from .models import Room
+
+
+# Student List (All Registered Login Users except superuser)
+def student_list(request):
+    students = User.objects.filter(is_superuser=False)
+    return render(request, 'student_list.html', {'students': students})
+
+
+# Room Page + Add Room
+def room_list(request):
+
+    if request.method == "POST":
+        room_number = request.POST.get('room_number')
+        room_type = request.POST.get('room_type')
+        total_beds = request.POST.get('total_beds')
+        available_beds = request.POST.get('available_beds')
+        rent = request.POST.get('rent')
+
+        Room.objects.create(
+            room_number=room_number,
+            room_type=room_type,
+            total_beds=total_beds,
+            available_beds=available_beds,
+            rent=rent
+        )
+
+        messages.success(request, "Room Added Successfully")
+        return redirect('rooms')
+
+    rooms = Room.objects.all()
+    return render(request, 'room_list.html', {'rooms': rooms})

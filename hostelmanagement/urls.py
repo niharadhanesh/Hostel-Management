@@ -1,17 +1,10 @@
-# hostelmanagement/urls.py
-
+from django.conf import settings
 from django.contrib import admin
-from django.urls import path
-from app import views
-
+from django.urls import path, include
+from django.conf.urls.static import static
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
-    # Landing Page
-    path('', views.index, name='index'),
-
-    # Authentication Pages
-    path('login/', views.login_page, name='login'),
-    path('register/', views.register_page, name='register'),
-    path('logout/', views.logout_page, name='logout'),
-]
+ path('admin/', admin.site.urls),
+ path('', include('app.urls'))
+] + static(settings.MEDIA_URL,document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.MEDIA_URL,
+document_root=settings.MEDIA_ROOT)

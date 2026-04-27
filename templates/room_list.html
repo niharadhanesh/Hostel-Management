@@ -1,0 +1,82 @@
+<!-- templates/room_list.html -->
+
+{% extends 'admin_base.html' %}
+
+{% block title %}Rooms{% endblock %}
+
+{% block content %}
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<div class="d-flex justify-content-between mb-4">
+    <h2 class="fw-bold">Room Management</h2>
+
+    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#roomModal">
+        + Add Room
+    </button>
+</div>
+
+
+<table class="table table-bordered bg-white">
+    <thead class="table-dark">
+        <tr>
+            <th>ID</th>
+            <th>Room No</th>
+            <th>Type</th>
+            <th>Total Beds</th>
+            <th>Available Beds</th>
+            <th>Rent</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        {% for room in rooms %}
+        <tr>
+            <td>{{ room.id }}</td>
+            <td>{{ room.room_number }}</td>
+            <td>{{ room.room_type }}</td>
+            <td>{{ room.total_beds }}</td>
+            <td>{{ room.available_beds }}</td>
+            <td>{{ room.rent }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+
+<!-- Modal -->
+<div class="modal fade" id="roomModal">
+<div class="modal-dialog">
+<div class="modal-content">
+
+<div class="modal-header">
+    <h5>Add Room</h5>
+    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+</div>
+
+<form method="POST">
+{% csrf_token %}
+
+<div class="modal-body">
+
+    <input type="text" name="room_number" class="form-control mb-3" placeholder="Room Number">
+
+    <input type="text" name="room_type" class="form-control mb-3" placeholder="Room Type">
+
+    <input type="number" name="total_beds" class="form-control mb-3" placeholder="Total Beds">
+
+    <input type="number" name="available_beds" class="form-control mb-3" placeholder="Available Beds">
+
+    <input type="number" name="rent" class="form-control mb-3" placeholder="Rent">
+
+</div>
+
+<div class="modal-footer">
+    <button type="submit" class="btn btn-success">Save Room</button>
+</div>
+
+</form>
+
+</div>
+</div>
+</div>
+
+{% endblock %}
