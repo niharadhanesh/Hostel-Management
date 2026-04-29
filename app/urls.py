@@ -11,6 +11,11 @@ urlpatterns = [
     path('admin-dashboard/', views.admin_dashboard, name='admin_dashboard'),
     path('student-dashboard/', views.student_dashboard, name='student_dashboard'),
     path('rooms/', views.room_list, name='rooms'),
-    path('students/', views.student_list, name='students'),
+    path('delete-room/<int:id>/', views.delete_room, name='delete_room'),
+    path('students/', views.student_list, name='student_list'),
+    path('delete-student/<int:id>/', views.delete_student, name='delete_student'),
+    path('my-room/', views.my_room, name='my_room'),
+    path('rent-status/', views.rent_status, name='rent_status'),
+  
 
 ]

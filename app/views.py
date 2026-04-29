@@ -106,33 +106,140 @@ from django.contrib.auth.models import User
 from django.contrib import messages
 from .models import Room
 
+# views.py
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
 
-# Student List (All Registered Login Users except superuser)
 def student_list(request):
-    students = User.objects.filter(is_superuser=False)
+    students = User.objects.filter(is_superuser=False, is_staff=False)
+
+    # Update student from modal
+    if request.method == "POST":
+        student_id = request.POST.get("student_id")
+        student = get_object_or_404(User, id=student_id)
+
+        student.first_name = request.POST.get("first_name")
+        student.username = request.POST.get("username")
+        student.email = request.POST.get("email")
+        student.save()
+
+        return redirect('student_list')
+
     return render(request, 'student_list.html', {'students': students})
 
 
-# Room Page + Add Room
+def delete_student(request, id):
+    student = get_object_or_404(User, id=id)
+    student.delete()
+    return redirect('student_list')
+
+
+# views.py
+# views.py
+from .models import Student
+from django.shortcuts import render, redirect, get_object_or_404
+# views.py  (FULL FIXED)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+from django.contrib.auth.models import User
+from .models import Room
+# views.py  (REPLACE room_list FULLY)
+
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib.auth.models import User
+from django.contrib import messages
+from .models import Room
+
+
 def room_list(request):
 
+    # ---------------- POST ----------------
     if request.method == "POST":
-        room_number = request.POST.get('room_number')
-        room_type = request.POST.get('room_type')
-        total_beds = request.POST.get('total_beds')
-        available_beds = request.POST.get('available_beds')
-        rent = request.POST.get('rent')
 
-        Room.objects.create(
-            room_number=room_number,
-            room_type=room_type,
-            total_beds=total_beds,
-            available_beds=available_beds,
-            rent=rent
-        )
+        action = request.POST.get("action")
 
-        messages.success(request, "Room Added Successfully")
-        return redirect('rooms')
+        # -------- ADD ROOM --------
+        if action == "room":
 
+            Room.objects.create(
+                room_number=request.POST.get("room_number"),
+                room_type=request.POST.get("room_type"),
+                total_beds=request.POST.get("total_beds"),
+                available_beds=request.POST.get("available_beds"),
+                rent=request.POST.get("rent")
+            )
+
+            messages.success(request, "Room Added Successfully")
+
+        # -------- ASSIGN ROOM --------
+        elif action == "assign":
+
+            student_id = request.POST.get("student_id")
+            room_id = request.POST.get("assign_room_id")
+
+            student = get_object_or_404(User, id=student_id)
+            room = get_object_or_404(Room, id=room_id)
+
+            if room.available_beds > 0:
+
+                # store room id in last_name
+                student.last_name = str(room.id)
+                student.save()
+
+                room.available_beds -= 1
+                room.save()
+
+                messages.success(request, "Room Assigned Successfully")
+
+            else:
+                messages.error(request, "No Beds Available")
+
+        return redirect("rooms")
+
+    # ---------------- GET ----------------
     rooms = Room.objects.all()
-    return render(request, 'room_list.html', {'rooms': rooms})
+
+    students = User.objects.filter(
+        is_superuser=False,
+        is_staff=False
+    )
+
+    return render(request, "room_list.html", {
+        "rooms": rooms,
+        "students": students
+    })
+
+def delete_room(request, id):
+    room = get_object_or_404(Room, id=id)
+    room.delete()
+    return redirect("rooms")
+
+# views.py
+
+from django.shortcuts import render
+
+# My Room Page
+def my_room(request):
+    student = request.user
+
+    # Example: linked room from student profile
+    room = getattr(student, 'room', None)
+
+    return render(request, 'my_room.html', {'room': room})
+
+
+# Rent Status Page
+def rent_status(request):
+    student = request.user
+
+    # Example static values (change later with model)
+    rent_data = {
+        'month': 'April 2026',
+        'amount': 5000,
+        'paid': 3000,
+        'balance': 2000,
+        'status': 'Pending'
+    }
+
+    return render(request, 'rent_status.html', {'rent': rent_data})

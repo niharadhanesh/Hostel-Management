@@ -1,0 +1,43 @@
+<!-- templates/rent_status.html -->
+
+{% extends 'student_base.html' %}
+{% block title %}Rent Status{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h2 class="mb-4 text-success">Rent Status</h2>
+
+        <table class="table table-bordered">
+            <tr>
+                <th>Month</th>
+                <td>{{ rent.month }}</td>
+            </tr>
+            <tr>
+                <th>Total Rent</th>
+                <td>₹ {{ rent.amount }}</td>
+            </tr>
+            <tr>
+                <th>Paid</th>
+                <td>₹ {{ rent.paid }}</td>
+            </tr>
+            <tr>
+                <th>Balance</th>
+                <td>₹ {{ rent.balance }}</td>
+            </tr>
+            <tr>
+                <th>Status</th>
+                <td>
+                    {% if rent.status == "Paid" %}
+                        <span class="badge bg-success">Paid</span>
+                    {% else %}
+                        <span class="badge bg-danger">Pending</span>
+                    {% endif %}
+                </td>
+            </tr>
+        </table>
+    </div>
+</div>
+
+{% endblock %}

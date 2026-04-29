@@ -1,0 +1,41 @@
+<!-- templates/my_room.html -->
+
+{% extends 'student_base.html' %}
+{% block title %}My Room{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+    <div class="card shadow p-4">
+        <h2 class="mb-4 text-primary">My Room Details</h2>
+
+        {% if room %}
+        <table class="table table-bordered">
+            <tr>
+                <th>Room Number</th>
+                <td>{{ room.room_number }}</td>
+            </tr>
+            <tr>
+                <th>Room Type</th>
+                <td>{{ room.room_type }}</td>
+            </tr>
+            <tr>
+                <th>Total Beds</th>
+                <td>{{ room.total_beds }}</td>
+            </tr>
+            <tr>
+                <th>Available Beds</th>
+                <td>{{ room.available_beds }}</td>
+            </tr>
+            <tr>
+                <th>Rent</th>
+                <td>₹ {{ room.rent }}</td>
+            </tr>
+        </table>
+        {% else %}
+        <p class="text-danger">No Room Assigned Yet.</p>
+        {% endif %}
+    </div>
+</div>
+
+{% endblock %}
