@@ -1,0 +1,125 @@
+<!-- templates/rent.html -->
+
+{% extends 'admin_base.html' %}
+{% block title %}Rent Status{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+<div class="card shadow border-0">
+<div class="card-header bg-primary text-white">
+<h4 class="mb-0">Rent Payment Status</h4>
+</div>
+
+<div class="card-body table-responsive">
+
+<table class="table table-bordered table-hover align-middle">
+<thead class="table-dark text-center">
+<tr>
+<th>ID</th>
+<th>Student</th>
+<th>Room</th>
+<th>Rent</th>
+<th>Status</th>
+<th>Paid Date</th>
+<th>Action</th>
+</tr>
+</thead>
+
+<tbody>
+
+{% for item in rent_data %}
+<tr class="text-center">
+
+<td>{{ forloop.counter }}</td>
+
+<td>
+{% if item.student.first_name|slice:":5" == "PAID|" %}
+{{ item.student.username }}
+{% else %}
+{{ item.student.first_name|default:item.student.username }}
+{% endif %}
+</td>
+
+<td>
+{% if item.room %}
+{{ item.room.room_number }}
+{% else %}
+Not Assigned
+{% endif %}
+</td>
+
+<td>
+{% if item.room %}
+₹ {{ item.room.rent }}
+{% else %}
+--
+{% endif %}
+</td>
+
+<td>
+{% if item.status == "Paid" %}
+<span class="badge bg-success px-3 py-2">Paid</span>
+{% else %}
+<span class="badge bg-danger px-3 py-2">Pending</span>
+{% endif %}
+</td>
+
+<td>
+{% if item.paid_date %}
+{{ item.paid_date }}
+{% else %}
+--
+{% endif %}
+</td>
+
+<td>
+
+{% if item.status == "Pending" %}
+
+<form method="POST" style="display:inline-block;">
+{% csrf_token %}
+<input type="hidden" name="student_id" value="{{ item.student.id }}">
+<input type="hidden" name="action" value="notify">
+<button class="btn btn-warning btn-sm">
+Notify
+</button>
+</form>
+
+<form method="POST" style="display:inline-block;">
+{% csrf_token %}
+<input type="hidden" name="student_id" value="{{ item.student.id }}">
+<input type="hidden" name="action" value="paid">
+<button class="btn btn-success btn-sm">
+Payment Done
+</button>
+</form>
+
+{% else %}
+<span class="text-success fw-bold">Completed</span>
+{% endif %}
+
+</td>
+
+</tr>
+
+{% empty %}
+
+<tr>
+<td colspan="7" class="text-center text-danger">
+No Students Found
+</td>
+</tr>
+
+{% endfor %}
+
+</tbody>
+</table>
+
+</div>
+</div>
+
+</div>
+
+{% endblock %}

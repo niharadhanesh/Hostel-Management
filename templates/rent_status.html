@@ -6,38 +6,106 @@
 {% block content %}
 
 <div class="container mt-4">
-    <div class="card shadow p-4">
-        <h2 class="mb-4 text-success">Rent Status</h2>
 
-        <table class="table table-bordered">
-            <tr>
-                <th>Month</th>
-                <td>{{ rent.month }}</td>
-            </tr>
-            <tr>
-                <th>Total Rent</th>
-                <td>₹ {{ rent.amount }}</td>
-            </tr>
-            <tr>
-                <th>Paid</th>
-                <td>₹ {{ rent.paid }}</td>
-            </tr>
-            <tr>
-                <th>Balance</th>
-                <td>₹ {{ rent.balance }}</td>
-            </tr>
-            <tr>
-                <th>Status</th>
-                <td>
-                    {% if rent.status == "Paid" %}
-                        <span class="badge bg-success">Paid</span>
-                    {% else %}
-                        <span class="badge bg-danger">Pending</span>
-                    {% endif %}
-                </td>
-            </tr>
-        </table>
+    {% if notified %}
+    <div class="alert alert-warning shadow-sm">
+        <strong>Reminder:</strong> Please pay your hostel rent as soon as possible.
     </div>
+    {% endif %}
+
+    <!-- Top Card -->
+    <div class="card shadow border-0 mb-4">
+        <div class="card-body">
+            <h2 class="text-success mb-3">My Rent Details</h2>
+
+            {% if room %}
+            <div class="row">
+
+                <div class="col-md-4">
+                    <div class="alert alert-primary">
+                        <strong>Room No:</strong> {{ room.room_number }}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="alert alert-info">
+                        <strong>Room Type:</strong> {{ room.room_type }}
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="alert alert-success">
+                        <strong>Monthly Rent:</strong> ₹ {{ room.rent }}
+                    </div>
+                </div>
+
+            </div>
+            {% else %}
+            <div class="alert alert-danger">
+                No Room Assigned Yet
+            </div>
+            {% endif %}
+        </div>
+    </div>
+
+
+    <!-- Rent Table -->
+    <div class="card shadow border-0">
+        <div class="card-header bg-success text-white">
+            <h5 class="mb-0">Current Rent Status</h5>
+        </div>
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered table-hover text-center align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Month</th>
+                        <th>Total Rent</th>
+                        <th>Paid</th>
+                        <th>Balance</th>
+                        <th>Status</th>
+                        <th>Paid Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for rent in rent_history %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ rent.month }}</td>
+                        <td>₹ {{ rent.amount }}</td>
+                        <td>₹ {{ rent.paid }}</td>
+                        <td>₹ {{ rent.balance }}</td>
+
+                        <td>
+                            {% if rent.status == "Paid" %}
+                            <span class="badge bg-success px-3 py-2">Paid</span>
+                            {% else %}
+                            <span class="badge bg-danger px-3 py-2">Pending</span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {% if rent.paid_date %}
+                                {{ rent.paid_date }}
+                            {% else %}
+                                --
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
 </div>
 
 {% endblock %}

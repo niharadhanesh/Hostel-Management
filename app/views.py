@@ -228,18 +228,118 @@ def my_room(request):
 
     return render(request, 'my_room.html', {'room': room})
 
+# views.py
 
-# Rent Status Page
+# views.py  (STUDENT RENT STATUS PAGE)
+
+from django.shortcuts import render
+from .models import Room
+
+
 def rent_status(request):
+
     student = request.user
+    room = None
+    notified = False
+    status = "Pending"
+    paid_date = ""
 
-    # Example static values (change later with model)
-    rent_data = {
-        'month': 'April 2026',
-        'amount': 5000,
-        'paid': 3000,
-        'balance': 2000,
-        'status': 'Pending'
-    }
+    if student.last_name:
+        try:
+            room = Room.objects.get(id=int(student.last_name))
+        except:
+            room = None
 
-    return render(request, 'rent_status.html', {'rent': rent_data})
+    if "NOTIFY|" in student.first_name:
+        notified = True
+
+    if "PAID|" in student.first_name:
+        status = "Paid"
+        paid_date = student.first_name.split("PAID|")[1]
+
+    amount = room.rent if room else 0
+    paid = amount if status == "Paid" else 0
+    balance = 0 if status == "Paid" else amount
+
+    rent_history = [{
+        "month": "Current Month",
+        "amount": amount,
+        "paid": paid,
+        "balance": balance,
+        "status": status,
+        "paid_date": paid_date
+    }]
+
+    return render(request, "rent_status.html", {
+        "room": room,
+        "rent_history": rent_history,
+        "notified": notified
+    })
+# views.py
+
+
+# views.py  (ADMIN RENT PAGE)
+
+from django.shortcuts import render, redirect
+from django.contrib.auth.models import User
+from django.contrib import messages
+from django.utils.timezone import now
+from .models import Room
+
+
+def rent_list(request):
+
+    if request.method == "POST":
+
+        student_id = request.POST.get("student_id")
+        action = request.POST.get("action")
+
+        student = User.objects.get(id=student_id)
+
+        # PAYMENT DONE
+        if action == "paid":
+            student.first_name = "PAID|" + str(now().date())
+            student.save()
+            messages.success(request, "Payment marked as done")
+
+        # NOTIFY STUDENT
+        elif action == "notify":
+            student.first_name = "NOTIFY|" + student.first_name
+            student.save()
+            messages.success(request, f"Reminder sent to {student.username}")
+
+        return redirect("rent")
+
+    students = User.objects.filter(
+        is_superuser=False,
+        is_staff=False
+    )
+
+    rent_data = []
+
+    for student in students:
+
+        room = None
+        status = "Pending"
+        paid_date = ""
+
+        if student.last_name:
+            try:
+                room = Room.objects.get(id=int(student.last_name))
+            except:
+                room = None
+
+        if "PAID|" in student.first_name:
+            status = "Paid"
+            paid_date = student.first_name.split("PAID|")[1]
+
+        rent_data.append({
+            "student": student,
+            "room": room,
+            "status": status,
+            "paid_date": paid_date
+        })
+
+    return render(request, "rent.html", {
+        "rent_data": rent_data
+    })
