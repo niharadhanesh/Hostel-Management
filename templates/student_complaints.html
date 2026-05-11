@@ -1,0 +1,99 @@
+{% extends 'student_base.html' %}
+{% block title %}Complaints{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <!-- ADD COMPLAINT -->
+    <div class="card shadow border-0 mb-4">
+        <div class="card-header bg-danger text-white">
+            <h5 class="mb-0">Raise Complaint</h5>
+        </div>
+
+        <div class="card-body">
+
+            <form method="POST">
+                {% csrf_token %}
+
+                <input type="text" name="subject"
+                       class="form-control mb-3"
+                       placeholder="Complaint Subject" required>
+
+                <textarea name="message"
+                          class="form-control mb-3"
+                          rows="4"
+                          placeholder="Describe your issue..." required></textarea>
+
+                <button class="btn btn-danger">
+                    Submit Complaint
+                </button>
+            </form>
+
+        </div>
+    </div>
+
+
+    <!-- COMPLAINT LIST -->
+    <div class="card shadow border-0">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">My Complaints</h5>
+        </div>
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered table-hover text-center">
+
+                <thead class="table-secondary">
+                    <tr>
+                        <th>#</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                        <th>Status</th>
+                        <th>Date</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for complaint in complaints %}
+                    <tr>
+                        <td>{{ forloop.counter }}</td>
+                        <td>{{ complaint.subject }}</td>
+                        <td>{{ complaint.message }}</td>
+
+                        <td>
+                            {% if complaint.status == "Resolved" %}
+                                <span class="badge bg-success">
+                                    Resolved
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+                            {{ complaint.created_at|date:"d M Y" }}
+                        </td>
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="5" class="text-danger">
+                            No complaints submitted
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

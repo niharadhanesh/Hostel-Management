@@ -1,125 +1,176 @@
 <!-- templates/rent.html -->
-
 {% extends 'admin_base.html' %}
 {% block title %}Rent Status{% endblock %}
+{% block page_title %}Rent Payments{% endblock %}
 
 {% block content %}
 
-<div class="container mt-4">
+<style>
+    .rg-table-wrap {
+        border-radius: 14px;
+        overflow: hidden;
+        border: 1px solid rgba(199,147,112,0.18);
+    }
 
-<div class="card shadow border-0">
-<div class="card-header bg-primary text-white">
-<h4 class="mb-0">Rent Payment Status</h4>
-</div>
+    .rg-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 0.875rem;
+    }
 
-<div class="card-body table-responsive">
+    .rg-table thead tr { background: rgba(199,147,112,0.18); }
 
-<table class="table table-bordered table-hover align-middle">
-<thead class="table-dark text-center">
-<tr>
-<th>ID</th>
-<th>Student</th>
-<th>Room</th>
-<th>Rent</th>
-<th>Status</th>
-<th>Paid Date</th>
-<th>Action</th>
-</tr>
-</thead>
+    .rg-table thead th {
+        padding: 13px 16px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #c7936e;
+        border: none;
+        text-align: center;
+    }
 
-<tbody>
+    .rg-table tbody tr {
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        transition: background 0.15s;
+    }
 
-{% for item in rent_data %}
-<tr class="text-center">
+    .rg-table tbody tr:last-child { border-bottom: none; }
+    .rg-table tbody tr:hover { background: rgba(199,147,112,0.06); }
 
-<td>{{ forloop.counter }}</td>
+    .rg-table tbody td {
+        padding: 13px 16px;
+        color: #f0ece4;
+        vertical-align: middle;
+        border: none;
+        text-align: center;
+    }
 
-<td>
-{% if item.student.first_name|slice:":5" == "PAID|" %}
-{{ item.student.username }}
-{% else %}
-{{ item.student.first_name|default:item.student.username }}
-{% endif %}
-</td>
+    .badge-paid {
+        display: inline-block;
+        background: rgba(52,211,153,0.12);
+        color: #34d399;
+        border: 1px solid rgba(52,211,153,0.25);
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-<td>
-{% if item.room %}
-{{ item.room.room_number }}
-{% else %}
-Not Assigned
-{% endif %}
-</td>
+    .badge-pending {
+        display: inline-block;
+        background: rgba(251,146,60,0.12);
+        color: #fb923c;
+        border: 1px solid rgba(251,146,60,0.25);
+        border-radius: 6px;
+        padding: 4px 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+    }
 
-<td>
-{% if item.room %}
-₹ {{ item.room.rent }}
-{% else %}
---
-{% endif %}
-</td>
+    .btn-rg {
+        display: inline-block;
+        padding: 5px 13px;
+        border-radius: 7px;
+        font-size: 0.77rem;
+        font-weight: 600;
+        border: none;
+        cursor: pointer;
+        text-decoration: none;
+        transition: opacity 0.2s;
+        font-family: 'Outfit', sans-serif;
+    }
 
-<td>
-{% if item.status == "Paid" %}
-<span class="badge bg-success px-3 py-2">Paid</span>
-{% else %}
-<span class="badge bg-danger px-3 py-2">Pending</span>
-{% endif %}
-</td>
+    .btn-rg:hover { opacity: 0.82; }
 
-<td>
-{% if item.paid_date %}
-{{ item.paid_date }}
-{% else %}
---
-{% endif %}
-</td>
+    .btn-rg-notify {
+        background: rgba(251,146,60,0.15);
+        color: #fb923c;
+        border: 1px solid rgba(251,146,60,0.28);
+    }
 
-<td>
+    .btn-rg-paid {
+        background: rgba(52,211,153,0.13);
+        color: #34d399;
+        border: 1px solid rgba(52,211,153,0.25);
+    }
 
-{% if item.status == "Pending" %}
+    .completed-text {
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #34d399;
+    }
 
-<form method="POST" style="display:inline-block;">
-{% csrf_token %}
-<input type="hidden" name="student_id" value="{{ item.student.id }}">
-<input type="hidden" name="action" value="notify">
-<button class="btn btn-warning btn-sm">
-Notify
-</button>
-</form>
+    .empty-row td {
+        color: #7c8ba3;
+        font-style: italic;
+        padding: 28px;
+    }
+</style>
 
-<form method="POST" style="display:inline-block;">
-{% csrf_token %}
-<input type="hidden" name="student_id" value="{{ item.student.id }}">
-<input type="hidden" name="action" value="paid">
-<button class="btn btn-success btn-sm">
-Payment Done
-</button>
-</form>
-
-{% else %}
-<span class="text-success fw-bold">Completed</span>
-{% endif %}
-
-</td>
-
-</tr>
-
-{% empty %}
-
-<tr>
-<td colspan="7" class="text-center text-danger">
-No Students Found
-</td>
-</tr>
-
-{% endfor %}
-
-</tbody>
-</table>
-
-</div>
-</div>
-
+<div class="rg-table-wrap">
+    <table class="rg-table">
+        <thead>
+            <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Room</th>
+                <th>Rent</th>
+                <th>Status</th>
+                <th>Paid Date</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for item in rent_data %}
+            <tr>
+                <td>{{ forloop.counter }}</td>
+                <td>
+                    {% if item.student.first_name|slice:":5" == "PAID|" %}
+                        {{ item.student.username }}
+                    {% else %}
+                        {{ item.student.first_name|default:item.student.username }}
+                    {% endif %}
+                </td>
+                <td>{% if item.room %}{{ item.room.room_number }}{% else %}<span style="color:#7c8ba3">—</span>{% endif %}</td>
+                <td>{% if item.room %}₹{{ item.room.rent }}{% else %}<span style="color:#7c8ba3">—</span>{% endif %}</td>
+                <td>
+                    {% if item.status == "Paid" %}
+                        <span class="badge-paid">Paid</span>
+                    {% else %}
+                        <span class="badge-pending">Pending</span>
+                    {% endif %}
+                </td>
+                <td>{% if item.paid_date %}{{ item.paid_date }}{% else %}<span style="color:#7c8ba3">—</span>{% endif %}</td>
+                <td>
+                    {% if item.status == "Pending" %}
+                        <div style="display:flex; gap:7px; justify-content:center;">
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="student_id" value="{{ item.student.id }}">
+                                <input type="hidden" name="action" value="notify">
+                                <button class="btn-rg btn-rg-notify">Notify</button>
+                            </form>
+                            <form method="POST" style="display:inline;">
+                                {% csrf_token %}
+                                <input type="hidden" name="student_id" value="{{ item.student.id }}">
+                                <input type="hidden" name="action" value="paid">
+                                <button class="btn-rg btn-rg-paid">Mark Paid</button>
+                            </form>
+                        </div>
+                    {% else %}
+                        <span class="completed-text">✓ Completed</span>
+                    {% endif %}
+                </td>
+            </tr>
+            {% empty %}
+            <tr class="empty-row">
+                <td colspan="7">No students found.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
 </div>
 
 {% endblock %}

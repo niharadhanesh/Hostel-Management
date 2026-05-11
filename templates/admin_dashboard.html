@@ -1,54 +1,130 @@
 <!-- templates/admin_dashboard.html -->
-
 {% extends 'admin_base.html' %}
-
 {% block title %}Admin Dashboard{% endblock %}
+{% block page_title %}Dashboard{% endblock %}
 
 {% block content %}
 
-<h2 class="mb-4 fw-bold">Admin Dashboard</h2>
+<style>
+    .stat-card {
+        background: linear-gradient(135deg, rgba(199,147,112,0.12), rgba(199,147,112,0.04));
+        border: 1px solid rgba(199,147,112,0.22);
+        border-radius: 16px;
+        padding: 28px 20px;
+        text-align: center;
+        transition: transform 0.2s, border-color 0.2s;
+    }
+    .stat-card:hover {
+        transform: translateY(-3px);
+        border-color: rgba(199,147,112,0.45);
+    }
+    .stat-card .stat-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 1.5px;
+        text-transform: uppercase;
+        color: #7c8ba3;
+        margin-bottom: 10px;
+    }
+    .stat-card .stat-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 2.4rem;
+        font-weight: 700;
+        color: #c7936e;
+        line-height: 1;
+    }
+    .stat-card .stat-icon {
+        font-size: 1.5rem;
+        margin-bottom: 10px;
+        display: block;
+    }
 
-<div class="row g-4">
+    .section-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #f0ece4;
+        margin-bottom: 16px;
+    }
 
-    <div class="col-md-3">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>Total Students</h6>
-            <h2 class="fw-bold text-primary">120</h2>
+    .activity-card {
+        background: rgba(199,147,112,0.05);
+        border: 1px solid rgba(199,147,112,0.15);
+        border-radius: 14px;
+        overflow: hidden;
+    }
+
+    .activity-item {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        padding: 14px 20px;
+        border-bottom: 1px solid rgba(255,255,255,0.05);
+        font-size: 0.875rem;
+        color: #f0ece4;
+        transition: background 0.2s;
+    }
+
+    .activity-item:last-child { border-bottom: none; }
+    .activity-item:hover { background: rgba(199,147,112,0.06); }
+
+    .activity-dot {
+        width: 8px; height: 8px;
+        border-radius: 50%;
+        background: #c7936e;
+        flex-shrink: 0;
+    }
+</style>
+
+<div class="row g-4 mb-5">
+
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="stat-icon">👥</span>
+            <div class="stat-label">Total Students</div>
+            <div class="stat-value">120</div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>Total Rooms</h6>
-            <h2 class="fw-bold text-success">45</h2>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="stat-icon">🏠</span>
+            <div class="stat-label">Total Rooms</div>
+            <div class="stat-value">45</div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>Pending Rent</h6>
-            <h2 class="fw-bold text-danger">18</h2>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="stat-icon">💳</span>
+            <div class="stat-label">Pending Rent</div>
+            <div class="stat-value">18</div>
         </div>
     </div>
 
-    <div class="col-md-3">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>Complaints</h6>
-            <h2 class="fw-bold text-warning">9</h2>
+    <div class="col-6 col-md-3">
+        <div class="stat-card">
+            <span class="stat-icon">📋</span>
+            <div class="stat-label">Complaints</div>
+            <div class="stat-value">9</div>
         </div>
     </div>
 
 </div>
 
-<div class="mt-5">
-    <div class="card shadow border-0 rounded-4 p-4">
-        <h5 class="mb-3">Recent Activities</h5>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">New student registered</li>
-            <li class="list-group-item">Room 204 rent paid</li>
-            <li class="list-group-item">Complaint submitted for WiFi issue</li>
-            <li class="list-group-item">Visitor entry added</li>
-        </ul>
+<div class="section-title">Recent Activity</div>
+<div class="activity-card">
+    <div class="activity-item">
+        <span class="activity-dot"></span> New student registered
+    </div>
+    <div class="activity-item">
+        <span class="activity-dot"></span> Room 204 rent paid
+    </div>
+    <div class="activity-item">
+        <span class="activity-dot"></span> Complaint submitted for WiFi issue
+    </div>
+    <div class="activity-item">
+        <span class="activity-dot"></span> Visitor entry added
     </div>
 </div>
 

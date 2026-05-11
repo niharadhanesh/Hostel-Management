@@ -343,3 +343,58 @@ def rent_list(request):
     return render(request, "rent.html", {
         "rent_data": rent_data
     })
+    
+# views.py
+
+from .models import Complaint
+from django.contrib import messages
+
+def student_complaints(request):
+
+    if request.method == "POST":
+        subject = request.POST.get("subject")
+        message = request.POST.get("message")
+
+        Complaint.objects.create(
+            student=request.user,
+            subject=subject,
+            message=message
+        )
+
+        messages.success(request, "Complaint submitted successfully")
+        return redirect('student_complaints')
+
+    complaints = Complaint.objects.filter(
+        student=request.user
+    ).order_by('-id')
+
+    return render(request, "student_complaints.html", {
+        "complaints": complaints
+    })
+    
+# views.py
+
+from .models import Complaint
+from django.shortcuts import render, redirect, get_object_or_404
+from django.contrib import messages
+
+
+def admin_complaints(request):
+
+    # -------- RESOLVE ACTION --------
+    if request.method == "POST":
+        complaint_id = request.POST.get("complaint_id")
+
+        complaint = get_object_or_404(Complaint, id=complaint_id)
+        complaint.status = "Resolved"
+        complaint.save()
+
+        messages.success(request, "Complaint marked as resolved")
+        return redirect('admin_complaints')
+
+    # -------- GET ALL COMPLAINTS --------
+    complaints = Complaint.objects.all().order_by('-id')
+
+    return render(request, "admin_complaints.html", {
+        "complaints": complaints
+    })

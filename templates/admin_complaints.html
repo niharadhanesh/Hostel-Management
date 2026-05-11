@@ -1,0 +1,100 @@
+{% extends 'admin_base.html' %}
+{% block title %}Complaints{% endblock %}
+
+{% block content %}
+
+<div class="container mt-4">
+
+    <div class="card shadow border-0">
+        <div class="card-header bg-danger text-white">
+            <h4 class="mb-0">Student Complaints</h4>
+        </div>
+
+        <div class="card-body table-responsive">
+
+            <table class="table table-bordered table-hover text-center align-middle">
+
+                <thead class="table-dark">
+                    <tr>
+                        <th>#</th>
+                        <th>Student</th>
+                        <th>Subject</th>
+                        <th>Message</th>
+                        <th>Date</th>
+                        <th>Status</th>
+                        <th>Action</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% for complaint in complaints %}
+                    <tr>
+
+                        <td>{{ forloop.counter }}</td>
+
+                        <td>
+                            {{ complaint.student.first_name|default:complaint.student.username }}
+                        </td>
+
+                        <td>{{ complaint.subject }}</td>
+
+                        <td style="max-width:250px;">
+                            {{ complaint.message }}
+                        </td>
+
+                        <td>
+                            {{ complaint.created_at|date:"d M Y" }}
+                        </td>
+
+                        <td>
+                            {% if complaint.status == "Resolved" %}
+                                <span class="badge bg-success px-3 py-2">
+                                    Resolved
+                                </span>
+                            {% else %}
+                                <span class="badge bg-warning text-dark px-3 py-2">
+                                    Pending
+                                </span>
+                            {% endif %}
+                        </td>
+
+                        <td>
+
+                            {% if complaint.status == "Pending" %}
+                            <form method="POST">
+                                {% csrf_token %}
+                                <input type="hidden" name="complaint_id" value="{{ complaint.id }}">
+
+                                <button class="btn btn-success btn-sm">
+                                    Resolve
+                                </button>
+                            </form>
+                            {% else %}
+                                <span class="text-success fw-bold">
+                                    Done
+                                </span>
+                            {% endif %}
+
+                        </td>
+
+                    </tr>
+
+                    {% empty %}
+                    <tr>
+                        <td colspan="7" class="text-danger">
+                            No Complaints Found
+                        </td>
+                    </tr>
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}
