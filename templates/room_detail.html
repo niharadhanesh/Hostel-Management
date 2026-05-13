@@ -1,0 +1,491 @@
+<!-- templates/room_detail.html -->
+{% extends 'admin_base.html' %}
+{% block title %}Room {{ room.room_number }}{% endblock %}
+{% block page_title %}Room {{ room.room_number }}{% endblock %}
+
+{% block content %}
+<style>
+    .back-link {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        color: #7c8ba3;
+        text-decoration: none;
+        margin-bottom: 20px;
+        transition: color 0.2s;
+    }
+    .back-link:hover { color: #c7936e; }
+    .back-link svg { width: 14px; height: 14px; flex-shrink: 0; }
+
+    .page-head {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        margin-bottom: 24px;
+        gap: 16px;
+        flex-wrap: wrap;
+    }
+    .room-title {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.6rem;
+        font-weight: 700;
+        color: #f0ece4;
+        margin: 0 0 6px;
+    }
+    .room-meta { display: flex; gap: 10px; flex-wrap: wrap; }
+    .meta-chip {
+        font-size: 0.73rem;
+        font-weight: 600;
+        padding: 4px 12px;
+        border-radius: 20px;
+    }
+    .chip-type { background: rgba(199,147,112,0.12); color: #c7936e; border: 1px solid rgba(199,147,112,0.25); }
+    .chip-rent { background: rgba(52,211,153,0.10);  color: #34d399; border: 1px solid rgba(52,211,153,0.22); }
+
+    .btn-solid {
+        background: #c7936e;
+        color: #0e1526;
+        padding: 9px 22px;
+        border-radius: 9px;
+        font-weight: 700;
+        font-size: 0.875rem;
+        border: none;
+        cursor: pointer;
+        transition: background 0.2s;
+        font-family: 'Outfit', sans-serif;
+        white-space: nowrap;
+    }
+    .btn-solid:hover { background: #b07a57; }
+
+    .btn-cancel {
+        background: rgba(255,255,255,0.06);
+        color: #7c8ba3;
+        padding: 8px 20px;
+        border-radius: 9px;
+        font-weight: 500;
+        font-size: 0.875rem;
+        border: 1px solid rgba(255,255,255,0.08);
+        cursor: pointer;
+        font-family: 'Outfit', sans-serif;
+        transition: background 0.2s;
+    }
+    .btn-cancel:hover { background: rgba(255,255,255,0.1); }
+
+    .no-beds-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 14px;
+        border-radius: 9px;
+        background: rgba(248,113,113,0.1);
+        border: 1px solid rgba(248,113,113,0.2);
+        color: #f87171;
+        font-size: 0.8rem;
+        font-weight: 600;
+    }
+
+    /* ── Stats ── */
+    .stats-row {
+        display: flex;
+        gap: 14px;
+        margin-bottom: 24px;
+        flex-wrap: wrap;
+    }
+    .stat-box {
+        flex: 1;
+        min-width: 90px;
+        background: rgba(255,255,255,0.04);
+        border: 1px solid rgba(199,147,112,0.12);
+        border-radius: 12px;
+        padding: 16px 12px;
+        text-align: center;
+    }
+    .stat-value {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.7rem;
+        font-weight: 700;
+        color: #f0ece4;
+        line-height: 1;
+        margin-bottom: 4px;
+    }
+    .stat-label {
+        font-size: 0.65rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 1px;
+        color: #7c8ba3;
+    }
+
+    /* ── Two-column ── */
+    .detail-grid {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 20px;
+    }
+    @media (max-width: 680px) { .detail-grid { grid-template-columns: 1fr; } }
+
+    .card-rg {
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(199,147,112,0.14);
+        border-radius: 16px;
+        padding: 20px;
+    }
+    .card-title {
+        font-size: 0.68rem;
+        font-weight: 700;
+        letter-spacing: 1.7px;
+        text-transform: uppercase;
+        color: #c7936e;
+        margin-bottom: 16px;
+    }
+
+    /* ── Beds grid ── */
+    .beds-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(78px, 1fr));
+        gap: 10px;
+    }
+    .bed-card {
+        border-radius: 12px;
+        padding: 14px 8px;
+        text-align: center;
+        border: 1px solid transparent;
+        transition: transform 0.15s;
+    }
+    .bed-card:hover { transform: translateY(-2px); }
+    .bed-card.available { background: rgba(52,211,153,0.08);  border-color: rgba(52,211,153,0.25); }
+    .bed-card.occupied  { background: rgba(248,113,113,0.08); border-color: rgba(248,113,113,0.22); }
+    .bed-icon  { font-size: 1.4rem; margin-bottom: 5px; display: block; }
+    .bed-label { font-size: 0.66rem; font-weight: 600; line-height: 1.4; }
+    .bed-card.available .bed-label { color: #34d399; }
+    .bed-card.occupied  .bed-label { color: #f87171; }
+
+    /* ── Student rows ── */
+    .student-row {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        border-radius: 10px;
+        background: rgba(255,255,255,0.03);
+        border: 1px solid rgba(255,255,255,0.06);
+        margin-bottom: 8px;
+    }
+    .student-row:last-child { margin-bottom: 0; }
+    .student-info { display: flex; align-items: center; gap: 10px; }
+    .student-avatar {
+        width: 34px; height: 34px;
+        border-radius: 50%;
+        background: rgba(199,147,112,0.18);
+        display: flex; align-items: center; justify-content: center;
+        font-size: 0.78rem; font-weight: 700;
+        color: #c7936e; flex-shrink: 0;
+        text-transform: uppercase;
+    }
+    .student-name     { font-size: 0.875rem; font-weight: 600; color: #f0ece4; }
+    .student-username { font-size: 0.72rem; color: #7c8ba3; }
+
+    .btn-unassign {
+        background: rgba(248,113,113,0.12);
+        color: #f87171;
+        border: 1px solid rgba(248,113,113,0.22);
+        border-radius: 7px;
+        padding: 4px 11px;
+        font-size: 0.72rem;
+        font-weight: 600;
+        cursor: pointer;
+        text-decoration: none;
+        transition: background 0.2s;
+        white-space: nowrap;
+    }
+    .btn-unassign:hover { background: rgba(248,113,113,0.24); }
+
+    .empty-state {
+        text-align: center;
+        padding: 28px 0;
+        color: #7c8ba3;
+        font-size: 0.85rem;
+    }
+    .empty-state .ei { font-size: 2rem; display: block; margin-bottom: 8px; }
+
+    /* ══ OVERLAY — NOT using .modal class to avoid Bootstrap CSS conflict ══ */
+    .hs-overlay {
+        position: fixed;
+        inset: 0;
+        background: rgba(0,0,0,0.7);
+        backdrop-filter: blur(4px);
+        -webkit-backdrop-filter: blur(4px);
+        z-index: 9999;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 16px;
+        visibility: hidden;
+        opacity: 0;
+        transition: opacity 0.2s, visibility 0.2s;
+    }
+    .hs-overlay.hs-open {
+        visibility: visible;
+        opacity: 1;
+    }
+    .hs-dialog {
+        background: #141d33;
+        border: 1px solid rgba(199,147,112,0.22);
+        border-radius: 16px;
+        width: 100%;
+        max-width: 460px;
+        box-shadow: 0 24px 60px rgba(0,0,0,0.6);
+        transform: translateY(-16px) scale(0.97);
+        transition: transform 0.22s ease, opacity 0.22s ease;
+        opacity: 0;
+    }
+    .hs-overlay.hs-open .hs-dialog {
+        transform: translateY(0) scale(1);
+        opacity: 1;
+    }
+    .hs-header {
+        background: rgba(199,147,112,0.1);
+        border-bottom: 1px solid rgba(199,147,112,0.18);
+        padding: 16px 20px;
+        border-radius: 16px 16px 0 0;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+    }
+    .hs-header h5 {
+        font-family: 'Cormorant Garamond', serif;
+        font-size: 1.1rem;
+        font-weight: 700;
+        color: #c7936e;
+        margin: 0;
+    }
+    .hs-close {
+        background: none;
+        border: none;
+        color: #7c8ba3;
+        font-size: 1.3rem;
+        cursor: pointer;
+        line-height: 1;
+        padding: 2px 6px;
+        border-radius: 6px;
+        transition: color 0.2s, background 0.2s;
+    }
+    .hs-close:hover { color: #f0ece4; background: rgba(255,255,255,0.08); }
+
+    .hs-body { padding: 22px 20px 10px; }
+    .hs-footer {
+        border-top: 1px solid rgba(199,147,112,0.12);
+        padding: 14px 20px;
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        border-radius: 0 0 16px 16px;
+    }
+
+    /* ── Form fields ── */
+    .f-label {
+        font-size: 0.75rem;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        color: #7c8ba3;
+        margin-bottom: 6px;
+        display: block;
+    }
+    .f-select-wrap {
+        position: relative;
+        margin-bottom: 14px;
+    }
+    .f-select-wrap select {
+        width: 100%;
+        box-sizing: border-box;
+        appearance: none;
+        -webkit-appearance: none;
+        background: rgba(255,255,255,0.05);
+        border: 1px solid rgba(199,147,112,0.22);
+        border-radius: 9px;
+        color: #f0ece4;
+        padding: 10px 38px 10px 13px;
+        font-size: 0.875rem;
+        outline: none;
+        font-family: 'Outfit', sans-serif;
+        cursor: pointer;
+        transition: border-color 0.2s, box-shadow 0.2s;
+    }
+    .f-select-wrap select:focus {
+        border-color: #c7936e;
+        box-shadow: 0 0 0 3px rgba(199,147,112,0.14);
+    }
+    .f-select-wrap select option { background: #141d33; color: #f0ece4; }
+    .f-select-wrap::after {
+        content: '';
+        position: absolute;
+        right: 14px;
+        top: 50%;
+        transform: translateY(-50%);
+        pointer-events: none;
+        border-left: 5px solid transparent;
+        border-right: 5px solid transparent;
+        border-top: 6px solid #c7936e;
+    }
+</style>
+
+<!-- Back -->
+<a href="{% url 'rooms' %}" class="back-link">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+        <path d="M19 12H5M5 12l7 7M5 12l7-7"/>
+    </svg>
+    Back to Rooms
+</a>
+
+<!-- Header -->
+<div class="page-head">
+    <div>
+        <h1 class="room-title">Room {{ room.room_number }}</h1>
+        <div class="room-meta">
+            <span class="meta-chip chip-type">{{ room.room_type }}</span>
+            <span class="meta-chip chip-rent">₹{{ room.rent }} / month</span>
+        </div>
+    </div>
+    <div>
+        {% if room.available_beds > 0 %}
+            <button class="btn-solid" onclick="hsOpen('assignOverlay')">+ Assign Student</button>
+        {% else %}
+            <span class="no-beds-badge">🛏 No beds available</span>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Stats -->
+<div class="stats-row">
+    <div class="stat-box">
+        <div class="stat-value">{{ room.total_beds }}</div>
+        <div class="stat-label">Total Beds</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value" style="color:#34d399;">{{ room.available_beds }}</div>
+        <div class="stat-label">Available</div>
+    </div>
+    <div class="stat-box">
+        <div class="stat-value" style="color:#f87171;">{{ occupied_beds }}</div>
+        <div class="stat-label">Occupied</div>
+    </div>
+</div>
+
+<!-- Grid -->
+<div class="detail-grid">
+
+    <!-- Bed status -->
+    <div class="card-rg">
+        <div class="card-title">Bed Status</div>
+        <div class="beds-grid">
+            {% for bed in bed_statuses %}
+            <div class="bed-card {{ bed.status }}">
+                <span class="bed-icon">🛏</span>
+                <div class="bed-label">
+                    Bed {{ bed.number }}<br>
+                    {% if bed.status == 'available' %}Free{% else %}Taken{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Assigned students -->
+    <div class="card-rg">
+        <div class="card-title">Assigned Students</div>
+        {% if assigned_students %}
+            {% for student in assigned_students %}
+            <div class="student-row">
+                <div class="student-info">
+                    <div class="student-avatar">
+                        {{ student.first_name|first|upper }}{{ student.username|first|upper }}
+                    </div>
+                    <div>
+                        <div class="student-name">
+                            {% if student.first_name %}{{ student.first_name }}{% else %}{{ student.username }}{% endif %}
+                        </div>
+                        <div class="student-username">@{{ student.username }}</div>
+                    </div>
+                </div>
+                <a href="{% url 'unassign_student' student.id %}"
+                   class="btn-unassign"
+                   onclick="return confirm('Remove {{ student.first_name|default:student.username }} from this room?')">
+                    Remove
+                </a>
+            </div>
+            {% endfor %}
+        {% else %}
+            <div class="empty-state">
+                <span class="ei">🪑</span>
+                No students assigned yet.
+            </div>
+        {% endif %}
+    </div>
+
+</div>
+
+<!-- ══ ASSIGN OVERLAY ══ -->
+<div class="hs-overlay" id="assignOverlay">
+    <div class="hs-dialog">
+        <div class="hs-header">
+            <h5>Assign Student — Room {{ room.room_number }}</h5>
+            <button type="button" class="hs-close" onclick="hsClose('assignOverlay')">&#x2715;</button>
+        </div>
+        <form method="POST" action="">
+            {% csrf_token %}
+            <input type="hidden" name="action" value="assign">
+            <div class="hs-body">
+
+                <label class="f-label">Select Student</label>
+                <div class="f-select-wrap">
+                    <select name="student_id" required>
+                        <option value="" disabled selected>Choose a student</option>
+                        {% for student in unassigned_students %}
+                        <option value="{{ student.id }}">
+                            {% if student.first_name %}{{ student.first_name }} — {% endif %}{{ student.username }}
+                        </option>
+                        {% empty %}
+                        <option disabled>No unassigned students</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <p style="font-size:0.75rem;color:#7c8ba3;margin:-4px 0 10px;">
+                    {{ room.available_beds }} bed{{ room.available_beds|pluralize }} available
+                </p>
+
+            </div>
+            <div class="hs-footer">
+                <button type="button" class="btn-cancel" onclick="hsClose('assignOverlay')">Cancel</button>
+                <button type="submit" class="btn-solid">Assign</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    function hsOpen(id) {
+        document.getElementById(id).classList.add('hs-open');
+        document.body.style.overflow = 'hidden';
+    }
+    function hsClose(id) {
+        document.getElementById(id).classList.remove('hs-open');
+        document.body.style.overflow = '';
+    }
+    document.querySelectorAll('.hs-overlay').forEach(function(el) {
+        el.addEventListener('click', function(e) {
+            if (e.target === el) hsClose(el.id);
+        });
+    });
+    document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            document.querySelectorAll('.hs-overlay.hs-open').forEach(function(el) {
+                hsClose(el.id);
+            });
+        }
+    });
+</script>
+
+{% endblock %}

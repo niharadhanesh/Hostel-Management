@@ -139,12 +139,7 @@ def delete_student(request, id):
 from .models import Student
 from django.shortcuts import render, redirect, get_object_or_404
 # views.py  (FULL FIXED)
-
-from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib import messages
-from django.contrib.auth.models import User
-from .models import Room
-# views.py  (REPLACE room_list FULLY)
+# views.py
 
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.models import User
@@ -153,68 +148,79 @@ from .models import Room
 
 
 def room_list(request):
-
-    # ---------------- POST ----------------
     if request.method == "POST":
-
-        action = request.POST.get("action")
-
-        # -------- ADD ROOM --------
-        if action == "room":
-
+        if request.POST.get("action") == "room":
             Room.objects.create(
                 room_number=request.POST.get("room_number"),
                 room_type=request.POST.get("room_type"),
                 total_beds=request.POST.get("total_beds"),
                 available_beds=request.POST.get("available_beds"),
-                rent=request.POST.get("rent")
+                rent=request.POST.get("rent"),
             )
-
-            messages.success(request, "Room Added Successfully")
-
-        # -------- ASSIGN ROOM --------
-        elif action == "assign":
-
-            student_id = request.POST.get("student_id")
-            room_id = request.POST.get("assign_room_id")
-
-            student = get_object_or_404(User, id=student_id)
-            room = get_object_or_404(Room, id=room_id)
-
-            if room.available_beds > 0:
-
-                # store room id in last_name
-                student.last_name = str(room.id)
-                student.save()
-
-                room.available_beds -= 1
-                room.save()
-
-                messages.success(request, "Room Assigned Successfully")
-
-            else:
-                messages.error(request, "No Beds Available")
-
+            messages.success(request, "Room added successfully.")
         return redirect("rooms")
 
-    # ---------------- GET ----------------
     rooms = Room.objects.all()
+    return render(request, "room_list.html", {"rooms": rooms})
 
-    students = User.objects.filter(
-        is_superuser=False,
-        is_staff=False
-    )
 
-    return render(request, "room_list.html", {
-        "rooms": rooms,
-        "students": students
+def room_detail(request, id):
+    room = get_object_or_404(Room, id=id)
+
+    if request.method == "POST":
+        if request.POST.get("action") == "assign":
+            student_id = request.POST.get("student_id")
+            student = get_object_or_404(User, id=student_id)
+            if room.available_beds > 0:
+                student.last_name = str(room.id)
+                student.save()
+                room.available_beds -= 1
+                room.save()
+                messages.success(request, f"{student.first_name or student.username} assigned to Room {room.room_number}.")
+            else:
+                messages.error(request, "No beds available in this room.")
+        return redirect("room_detail", id=room.id)
+
+    all_students = User.objects.filter(is_superuser=False, is_staff=False)
+
+    assigned_students   = [s for s in all_students if s.last_name == str(room.id)]
+    unassigned_students = [s for s in all_students if not s.last_name or not s.last_name.isdigit()]
+
+    occupied_beds = room.total_beds - room.available_beds
+    bed_statuses  = [
+        {"number": i, "status": "occupied" if i <= occupied_beds else "available"}
+        for i in range(1, room.total_beds + 1)
+    ]
+
+    return render(request, "room_detail.html", {
+        "room": room,
+        "assigned_students": assigned_students,
+        "unassigned_students": unassigned_students,
+        "occupied_beds": occupied_beds,
+        "bed_statuses": bed_statuses,
     })
+
+
+def unassign_student(request, id):
+    student = get_object_or_404(User, id=id)
+    room_id = student.last_name
+    if room_id and room_id.isdigit():
+        room = get_object_or_404(Room, id=int(room_id))
+        room.available_beds += 1
+        room.save()
+        student.last_name = ""
+        student.save()
+        messages.success(request, f"{student.first_name or student.username} removed from Room {room.room_number}.")
+        return redirect("room_detail", id=room.id)
+    messages.error(request, "Student is not assigned to any room.")
+    return redirect("rooms")
+
 
 def delete_room(request, id):
     room = get_object_or_404(Room, id=id)
     room.delete()
+    messages.success(request, "Room deleted.")
     return redirect("rooms")
-
 # views.py
 
 from django.shortcuts import render
