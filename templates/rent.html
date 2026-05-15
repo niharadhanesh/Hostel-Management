@@ -6,111 +6,235 @@
 {% block content %}
 
 <style>
-    .rg-table-wrap {
-        border-radius: 14px;
-        overflow: hidden;
-        border: 1px solid rgba(199,147,112,0.18);
+
+    .page-head{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:22px;
+        gap:12px;
+        flex-wrap:wrap;
     }
 
-    .rg-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 0.875rem;
+    .section-title{
+        font-family:'Cormorant Garamond', serif;
+        font-size:1.3rem;
+        font-weight:700;
+        color:#f0ece4;
     }
 
-    .rg-table thead tr { background: rgba(199,147,112,0.18); }
+    /* ───────────────── TABLE WRAP ───────────────── */
 
-    .rg-table thead th {
-        padding: 13px 16px;
-        font-size: 0.72rem;
-        font-weight: 600;
-        letter-spacing: 1.5px;
-        text-transform: uppercase;
-        color: #c7936e;
-        border: none;
-        text-align: center;
+    .rg-table-wrap{
+        border-radius:16px;
+        overflow-x:auto;
+        border:1px solid rgba(199,147,112,0.18);
+        background:#141d33;
+
+        /* Smooth mobile scrolling */
+        -webkit-overflow-scrolling:touch;
+        scrollbar-width:thin;
     }
 
-    .rg-table tbody tr {
-        border-bottom: 1px solid rgba(255,255,255,0.05);
-        transition: background 0.15s;
+    .rg-table{
+        width:100%;
+        min-width:850px;
+        border-collapse:collapse;
+        font-size:0.875rem;
     }
 
-    .rg-table tbody tr:last-child { border-bottom: none; }
-    .rg-table tbody tr:hover { background: rgba(199,147,112,0.06); }
-
-    .rg-table tbody td {
-        padding: 13px 16px;
-        color: #f0ece4;
-        vertical-align: middle;
-        border: none;
-        text-align: center;
+    .rg-table thead tr{
+        background:rgba(199,147,112,0.18);
     }
 
-    .badge-paid {
-        display: inline-block;
-        background: rgba(52,211,153,0.12);
-        color: #34d399;
-        border: 1px solid rgba(52,211,153,0.25);
-        border-radius: 6px;
-        padding: 4px 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
+    .rg-table thead th{
+        padding:13px 16px;
+        font-size:0.72rem;
+        font-weight:600;
+        letter-spacing:1.5px;
+        text-transform:uppercase;
+        color:#c7936e;
+        border:none;
+        text-align:center;
+        white-space:nowrap;
     }
 
-    .badge-pending {
-        display: inline-block;
-        background: rgba(251,146,60,0.12);
-        color: #fb923c;
-        border: 1px solid rgba(251,146,60,0.25);
-        border-radius: 6px;
-        padding: 4px 12px;
-        font-size: 0.75rem;
-        font-weight: 600;
+    .rg-table tbody tr{
+        border-bottom:1px solid rgba(255,255,255,0.05);
+        transition:background 0.15s;
     }
 
-    .btn-rg {
-        display: inline-block;
-        padding: 5px 13px;
-        border-radius: 7px;
-        font-size: 0.77rem;
-        font-weight: 600;
-        border: none;
-        cursor: pointer;
-        text-decoration: none;
-        transition: opacity 0.2s;
-        font-family: 'Outfit', sans-serif;
+    .rg-table tbody tr:last-child{
+        border-bottom:none;
     }
 
-    .btn-rg:hover { opacity: 0.82; }
-
-    .btn-rg-notify {
-        background: rgba(251,146,60,0.15);
-        color: #fb923c;
-        border: 1px solid rgba(251,146,60,0.28);
+    .rg-table tbody tr:hover{
+        background:rgba(199,147,112,0.06);
     }
 
-    .btn-rg-paid {
-        background: rgba(52,211,153,0.13);
-        color: #34d399;
-        border: 1px solid rgba(52,211,153,0.25);
+    .rg-table tbody td{
+        padding:14px 16px;
+        color:#f0ece4;
+        vertical-align:middle;
+        border:none;
+        text-align:center;
+        white-space:nowrap;
     }
 
-    .completed-text {
-        font-size: 0.8rem;
-        font-weight: 600;
-        color: #34d399;
+    /* ───────────────── BADGES ───────────────── */
+
+    .badge-paid{
+        display:inline-block;
+        background:rgba(52,211,153,0.12);
+        color:#34d399;
+        border:1px solid rgba(52,211,153,0.25);
+        border-radius:20px;
+        padding:5px 14px;
+        font-size:0.75rem;
+        font-weight:600;
     }
 
-    .empty-row td {
-        color: #7c8ba3;
-        font-style: italic;
-        padding: 28px;
+    .badge-pending{
+        display:inline-block;
+        background:rgba(251,146,60,0.12);
+        color:#fb923c;
+        border:1px solid rgba(251,146,60,0.25);
+        border-radius:20px;
+        padding:5px 14px;
+        font-size:0.75rem;
+        font-weight:600;
     }
+
+    /* ───────────────── BUTTONS ───────────────── */
+
+    .btn-rg{
+        display:inline-flex;
+        align-items:center;
+        justify-content:center;
+
+        padding:7px 14px;
+
+        border-radius:8px;
+
+        font-size:0.77rem;
+        font-weight:600;
+
+        border:none;
+
+        cursor:pointer;
+
+        text-decoration:none;
+
+        transition:0.2s;
+
+        font-family:'Outfit', sans-serif;
+    }
+
+    .btn-rg:hover{
+        opacity:0.85;
+        transform:translateY(-1px);
+    }
+
+    .btn-rg-notify{
+        background:rgba(251,146,60,0.15);
+        color:#fb923c;
+        border:1px solid rgba(251,146,60,0.28);
+    }
+
+    .btn-rg-paid{
+        background:rgba(52,211,153,0.13);
+        color:#34d399;
+        border:1px solid rgba(52,211,153,0.25);
+    }
+
+    .completed-text{
+        font-size:0.82rem;
+        font-weight:700;
+        color:#34d399;
+    }
+
+    .empty-row td{
+        color:#7c8ba3;
+        font-style:italic;
+        padding:28px;
+    }
+
+    .muted-text{
+        color:#7c8ba3;
+    }
+
+    .action-wrap{
+        display:flex;
+        gap:8px;
+        justify-content:center;
+        align-items:center;
+        flex-wrap:wrap;
+    }
+
+    .student-name{
+        color:#c7936e;
+        font-weight:600;
+    }
+
+    /* ───────────────── MOBILE RESPONSIVE ───────────────── */
+
+    @media(max-width:768px){
+
+        .rg-table-wrap{
+            border-radius:14px;
+        }
+
+        .rg-table{
+            min-width:780px;
+        }
+
+        .rg-table thead th{
+            font-size:0.68rem;
+            padding:12px 14px;
+        }
+
+        .rg-table tbody td{
+            padding:12px 14px;
+            font-size:0.82rem;
+        }
+
+        .btn-rg{
+            padding:6px 12px;
+            font-size:0.72rem;
+        }
+
+        .badge-paid,
+        .badge-pending{
+            font-size:0.7rem;
+            padding:4px 12px;
+        }
+    }
+
+    @media(max-width:480px){
+
+        .rg-table{
+            min-width:720px;
+        }
+
+        .action-wrap{
+            flex-direction:column;
+        }
+
+        .btn-rg{
+            width:100%;
+        }
+    }
+
 </style>
 
+<div class="page-head">
+    <span class="section-title">Rent Payments</span>
+</div>
+
 <div class="rg-table-wrap">
+
     <table class="rg-table">
+
         <thead>
             <tr>
                 <th>#</th>
@@ -122,55 +246,145 @@
                 <th>Action</th>
             </tr>
         </thead>
+
         <tbody>
+
             {% for item in rent_data %}
+
             <tr>
+
                 <td>{{ forloop.counter }}</td>
-                <td>
+
+                <td class="student-name">
+
                     {% if item.student.first_name|slice:":5" == "PAID|" %}
                         {{ item.student.username }}
                     {% else %}
                         {{ item.student.first_name|default:item.student.username }}
                     {% endif %}
+
                 </td>
-                <td>{% if item.room %}{{ item.room.room_number }}{% else %}<span style="color:#7c8ba3">—</span>{% endif %}</td>
-                <td>{% if item.room %}₹{{ item.room.rent }}{% else %}<span style="color:#7c8ba3">—</span>{% endif %}</td>
+
                 <td>
+
+                    {% if item.room %}
+                        {{ item.room.room_number }}
+                    {% else %}
+                        <span class="muted-text">—</span>
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if item.room %}
+                        ₹{{ item.room.rent }}
+                    {% else %}
+                        <span class="muted-text">—</span>
+                    {% endif %}
+
+                </td>
+
+                <td>
+
                     {% if item.status == "Paid" %}
-                        <span class="badge-paid">Paid</span>
+
+                        <span class="badge-paid">
+                            Paid
+                        </span>
+
                     {% else %}
-                        <span class="badge-pending">Pending</span>
+
+                        <span class="badge-pending">
+                            Pending
+                        </span>
+
                     {% endif %}
+
                 </td>
-                <td>{% if item.paid_date %}{{ item.paid_date }}{% else %}<span style="color:#7c8ba3">—</span>{% endif %}</td>
+
                 <td>
-                    {% if item.status == "Pending" %}
-                        <div style="display:flex; gap:7px; justify-content:center;">
-                            <form method="POST" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="student_id" value="{{ item.student.id }}">
-                                <input type="hidden" name="action" value="notify">
-                                <button class="btn-rg btn-rg-notify">Notify</button>
-                            </form>
-                            <form method="POST" style="display:inline;">
-                                {% csrf_token %}
-                                <input type="hidden" name="student_id" value="{{ item.student.id }}">
-                                <input type="hidden" name="action" value="paid">
-                                <button class="btn-rg btn-rg-paid">Mark Paid</button>
-                            </form>
-                        </div>
+
+                    {% if item.paid_date %}
+                        {{ item.paid_date }}
                     {% else %}
-                        <span class="completed-text">✓ Completed</span>
+                        <span class="muted-text">—</span>
                     {% endif %}
+
                 </td>
+
+                <td>
+
+                    {% if item.status == "Pending" %}
+
+                    <div class="action-wrap">
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <input type="hidden"
+                                   name="student_id"
+                                   value="{{ item.student.id }}">
+
+                            <input type="hidden"
+                                   name="action"
+                                   value="notify">
+
+                            <button class="btn-rg btn-rg-notify">
+                                Notify
+                            </button>
+
+                        </form>
+
+                        <form method="POST">
+
+                            {% csrf_token %}
+
+                            <input type="hidden"
+                                   name="student_id"
+                                   value="{{ item.student.id }}">
+
+                            <input type="hidden"
+                                   name="action"
+                                   value="paid">
+
+                            <button class="btn-rg btn-rg-paid">
+                                Mark Paid
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                    {% else %}
+
+                        <span class="completed-text">
+                            ✓ Completed
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
             </tr>
+
             {% empty %}
+
             <tr class="empty-row">
-                <td colspan="7">No students found.</td>
+
+                <td colspan="7">
+                    No students found.
+                </td>
+
             </tr>
+
             {% endfor %}
+
         </tbody>
+
     </table>
+
 </div>
 
 {% endblock %}

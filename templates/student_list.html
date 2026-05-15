@@ -1,110 +1,560 @@
-<!-- student_list.html -->
+<!-- templates/student_list.html -->
 
 {% extends 'admin_base.html' %}
 {% block title %}Students{% endblock %}
+{% block page_title %}Students{% endblock %}
 
 {% block content %}
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js"></script>
+<style>
 
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-<h2 class="mb-4 fw-bold">Registered Students</h2>
+    .page-head{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:22px;
+        gap:12px;
+        flex-wrap:wrap;
+    }
 
-<table class="table table-bordered bg-white shadow">
-    <thead class="table-primary">
-        <tr>
-            <th>ID</th>
-            <th>Name</th>
-            <th>Username</th>
-            <th>Email</th>
-            <th>Date Joined</th>
-            <th>Action</th>
-        </tr>
-    </thead>
+    .section-title{
+        font-family:'Cormorant Garamond', serif;
+        font-size:1.35rem;
+        font-weight:700;
+        color:#f0ece4;
+    }
 
-    <tbody>
-        {% for student in students %}
-        <tr>
-            <td>{{ student.id }}</td>
-            <td>{{ student.first_name }}</td>
-            <td>{{ student.username }}</td>
-            <td>{{ student.email }}</td>
-            <td>{{ student.date_joined|date:"d-m-Y" }}</td>
-            <td>
-                <!-- FIXED BUTTON -->
-                <button type="button"
-                        class="btn btn-warning btn-sm"
-                        data-toggle="modal"
-                        data-target="#editModal{{ student.id }}">
-                    Edit
-                </button>
+    /* ───────────────── TABLE ───────────────── */
 
-                <a href="{% url 'delete_student' student.id %}"
-                   class="btn btn-danger btn-sm"
-                   onclick="return confirm('Delete student?')">
-                   Delete
-                </a>
-            </td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+    .rg-table-wrap{
+        border-radius:16px;
+        overflow-x:auto;
+        border:1px solid rgba(199,147,112,0.18);
+        background:#141d33;
+    }
 
+    .rg-table{
+        width:100%;
+        border-collapse:collapse;
+        min-width:750px;
+    }
 
-<!-- MODALS OUTSIDE TABLE -->
+    .rg-table thead tr{
+        background:rgba(199,147,112,0.18);
+    }
+
+    .rg-table thead th{
+        padding:14px 16px;
+        font-size:0.72rem;
+        font-weight:600;
+        letter-spacing:1.4px;
+        text-transform:uppercase;
+        color:#c7936e;
+        border:none;
+        white-space:nowrap;
+    }
+
+    .rg-table tbody tr{
+        border-bottom:1px solid rgba(255,255,255,0.05);
+        transition:0.2s;
+    }
+
+    .rg-table tbody tr:last-child{
+        border-bottom:none;
+    }
+
+    .rg-table tbody tr:hover{
+        background:rgba(199,147,112,0.05);
+    }
+
+    .rg-table tbody td{
+        padding:14px 16px;
+        color:#f0ece4;
+        border:none;
+        vertical-align:middle;
+        white-space:nowrap;
+        font-size:0.88rem;
+    }
+
+    .student-name{
+        font-weight:600;
+        color:#c7936e;
+    }
+
+    /* ───────────────── BUTTONS ───────────────── */
+
+    .btn-edit{
+        display:inline-block;
+        padding:6px 14px;
+        border-radius:8px;
+        font-size:0.78rem;
+        font-weight:600;
+        cursor:pointer;
+        text-decoration:none;
+        background:rgba(251,191,36,0.12);
+        color:#fbbf24;
+        border:1px solid rgba(251,191,36,0.24);
+        transition:0.2s;
+    }
+
+    .btn-edit:hover{
+        background:rgba(251,191,36,0.22);
+        color:#fff;
+    }
+
+    .btn-danger{
+        display:inline-block;
+        padding:6px 14px;
+        border-radius:8px;
+        font-size:0.78rem;
+        font-weight:600;
+        cursor:pointer;
+        text-decoration:none;
+        background:rgba(220,60,60,0.15);
+        color:#f87171;
+        border:1px solid rgba(220,60,60,0.25);
+        transition:0.2s;
+    }
+
+    .btn-danger:hover{
+        background:rgba(220,60,60,0.28);
+        color:#fff;
+    }
+
+    .action-group{
+        display:flex;
+        gap:8px;
+        align-items:center;
+    }
+
+    .btn-solid{
+        background:#c7936e;
+        color:#0e1526;
+        padding:9px 20px;
+        border-radius:10px;
+        font-weight:700;
+        font-size:0.875rem;
+        border:none;
+        cursor:pointer;
+        transition:0.2s;
+        font-family:'Outfit', sans-serif;
+    }
+
+    .btn-solid:hover{
+        background:#b07a57;
+    }
+
+    .btn-cancel{
+        background:rgba(255,255,255,0.06);
+        color:#7c8ba3;
+        padding:8px 20px;
+        border-radius:9px;
+        font-weight:500;
+        font-size:0.875rem;
+        border:1px solid rgba(255,255,255,0.08);
+        cursor:pointer;
+        transition:0.2s;
+    }
+
+    .btn-cancel:hover{
+        background:rgba(255,255,255,0.1);
+    }
+
+    /* ───────────────── MODAL ───────────────── */
+
+    .hs-overlay{
+        position:fixed;
+        inset:0;
+        width:100%;
+        height:100vh;
+
+        background:rgba(0,0,0,0.72);
+
+        backdrop-filter:blur(5px);
+        -webkit-backdrop-filter:blur(5px);
+
+        display:flex;
+        align-items:center;
+        justify-content:center;
+
+        padding:20px;
+        z-index:99999;
+
+        visibility:hidden;
+        opacity:0;
+
+        transition:0.25s ease;
+    }
+
+    .hs-overlay.hs-open{
+        visibility:visible;
+        opacity:1;
+    }
+
+    .hs-dialog{
+        width:100%;
+        max-width:460px;
+
+        background:#141d33;
+
+        border:1px solid rgba(199,147,112,0.22);
+
+        border-radius:18px;
+
+        box-shadow:0 25px 60px rgba(0,0,0,0.65);
+
+        transform:translateY(-20px) scale(0.95);
+        opacity:0;
+
+        transition:0.25s ease;
+
+        max-height:90vh;
+        overflow-y:auto;
+    }
+
+    .hs-overlay.hs-open .hs-dialog{
+        transform:translateY(0) scale(1);
+        opacity:1;
+    }
+
+    .hs-header{
+        background:rgba(199,147,112,0.10);
+
+        border-bottom:1px solid rgba(199,147,112,0.18);
+
+        padding:16px 20px;
+
+        border-radius:18px 18px 0 0;
+
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+    }
+
+    .hs-header h5{
+        font-family:'Cormorant Garamond', serif;
+        font-size:1.2rem;
+        font-weight:700;
+        color:#c7936e;
+        margin:0;
+    }
+
+    .hs-close{
+        background:none;
+        border:none;
+        color:#7c8ba3;
+        font-size:1.4rem;
+        cursor:pointer;
+        line-height:1;
+        padding:2px 6px;
+        border-radius:6px;
+        transition:0.2s;
+    }
+
+    .hs-close:hover{
+        color:#f0ece4;
+        background:rgba(255,255,255,0.08);
+    }
+
+    .hs-body{
+        padding:22px 20px 10px;
+    }
+
+    .hs-footer{
+        border-top:1px solid rgba(199,147,112,0.12);
+
+        padding:14px 20px;
+
+        display:flex;
+        justify-content:flex-end;
+        gap:10px;
+
+        flex-wrap:wrap;
+    }
+
+    /* ───────────────── FORM ───────────────── */
+
+    .f-label{
+        font-size:0.75rem;
+        font-weight:600;
+        letter-spacing:0.5px;
+        color:#7c8ba3;
+        margin-bottom:6px;
+        display:block;
+    }
+
+    .f-input{
+        width:100%;
+        box-sizing:border-box;
+
+        background:rgba(255,255,255,0.05);
+
+        border:1px solid rgba(199,147,112,0.22);
+
+        border-radius:10px;
+
+        color:#f0ece4;
+
+        padding:11px 13px;
+
+        font-size:0.875rem;
+
+        margin-bottom:14px;
+
+        outline:none;
+
+        transition:0.2s;
+    }
+
+    .f-input:focus{
+        border-color:#c7936e;
+        box-shadow:0 0 0 3px rgba(199,147,112,0.14);
+        background:rgba(255,255,255,0.07);
+    }
+
+    /* ───────────────── MOBILE ───────────────── */
+
+    @media(max-width:768px){
+
+        .section-title{
+            font-size:1.1rem;
+        }
+
+        .rg-table{
+            min-width:650px;
+        }
+
+        .hs-dialog{
+            max-width:100%;
+            border-radius:16px;
+        }
+
+        .hs-body{
+            padding:18px 16px 8px;
+        }
+
+        .hs-header{
+            padding:14px 16px;
+        }
+
+        .hs-footer{
+            padding:14px 16px;
+        }
+
+        .hs-footer button{
+            flex:1;
+        }
+    }
+
+</style>
+
+<!-- ───────────────── HEADER ───────────────── -->
+
+<div class="page-head">
+    <span class="section-title">Registered Students</span>
+</div>
+
+<!-- ───────────────── TABLE ───────────────── -->
+
+<div class="rg-table-wrap">
+
+    <table class="rg-table">
+
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Date Joined</th>
+                <th>Action</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% for student in students %}
+            <tr>
+
+                <td>{{ student.id }}</td>
+
+                <td class="student-name">
+                    {{ student.first_name }}
+                </td>
+
+                <td>{{ student.username }}</td>
+
+                <td>{{ student.email }}</td>
+
+                <td>
+                    {{ student.date_joined|date:"d-m-Y" }}
+                </td>
+
+                <td>
+
+                    <div class="action-group">
+
+                        <button type="button"
+                                class="btn-edit"
+                                onclick="hsOpen('editModal{{ student.id }}')">
+
+                            Edit
+
+                        </button>
+
+                        <a href="{% url 'delete_student' student.id %}"
+                           class="btn-danger"
+                           onclick="return confirm('Delete student?')">
+
+                           Delete
+
+                        </a>
+
+                    </div>
+
+                </td>
+
+            </tr>
+            {% endfor %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- ───────────────── MODALS ───────────────── -->
+
 {% for student in students %}
-<div class="modal fade" id="editModal{{ student.id }}" tabindex="-1">
-    <div class="modal-dialog">
-        <div class="modal-content">
 
-            <div class="modal-header bg-primary text-white">
-                <h5 class="modal-title">Edit Student</h5>
-                <button type="button" class="close text-white" data-dismiss="modal">
-                    <span>&times;</span>
-                </button>
-            </div>
+<div class="hs-overlay" id="editModal{{ student.id }}">
 
-            <form method="POST">
-                {% csrf_token %}
-                <div class="modal-body">
+    <div class="hs-dialog">
 
-                    <input type="hidden" name="student_id" value="{{ student.id }}">
+        <div class="hs-header">
 
-                    <label>First Name</label>
-                    <input type="text" name="first_name"
-                           value="{{ student.first_name }}"
-                           class="form-control mb-2">
+            <h5>Edit Student</h5>
 
-                    <label>Username</label>
-                    <input type="text" name="username"
-                           value="{{ student.username }}"
-                           class="form-control mb-2">
+            <button type="button"
+                    class="hs-close"
+                    onclick="hsClose('editModal{{ student.id }}')">
 
-                    <label>Email</label>
-                    <input type="email" name="email"
-                           value="{{ student.email }}"
-                           class="form-control">
+                &times;
 
-                </div>
-
-                <div class="modal-footer">
-                    <button type="button"
-                            class="btn btn-secondary"
-                            data-dismiss="modal">
-                        Close
-                    </button>
-
-                    <button type="submit"
-                            class="btn btn-success">
-                        Update
-                    </button>
-                </div>
-            </form>
+            </button>
 
         </div>
+
+        <form method="POST">
+
+            {% csrf_token %}
+
+            <div class="hs-body">
+
+                <input type="hidden"
+                       name="student_id"
+                       value="{{ student.id }}">
+
+                <label class="f-label">First Name</label>
+
+                <input type="text"
+                       name="first_name"
+                       value="{{ student.first_name }}"
+                       class="f-input">
+
+                <label class="f-label">Username</label>
+
+                <input type="text"
+                       name="username"
+                       value="{{ student.username }}"
+                       class="f-input">
+
+                <label class="f-label">Email</label>
+
+                <input type="email"
+                       name="email"
+                       value="{{ student.email }}"
+                       class="f-input">
+
+            </div>
+
+            <div class="hs-footer">
+
+                <button type="button"
+                        class="btn-cancel"
+                        onclick="hsClose('editModal{{ student.id }}')">
+
+                    Cancel
+
+                </button>
+
+                <button type="submit"
+                        class="btn-solid">
+
+                    Update
+
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
+
 </div>
+
 {% endfor %}
+
+<script>
+
+    function hsOpen(id) {
+
+        document.getElementById(id).classList.add('hs-open');
+
+        document.body.style.overflow = 'hidden';
+    }
+
+    function hsClose(id) {
+
+        document.getElementById(id).classList.remove('hs-open');
+
+        document.body.style.overflow = '';
+    }
+
+    // Close on backdrop click
+
+    document.querySelectorAll('.hs-overlay').forEach(function(el){
+
+        el.addEventListener('click', function(e){
+
+            if(e.target === el){
+
+                hsClose(el.id);
+
+            }
+
+        });
+
+    });
+
+    // Close on Escape key
+
+    document.addEventListener('keydown', function(e){
+
+        if(e.key === 'Escape'){
+
+            document
+                .querySelectorAll('.hs-overlay.hs-open')
+                .forEach(function(el){
+
+                    hsClose(el.id);
+
+                });
+
+        }
+
+    });
+
+</script>
 
 {% endblock %}

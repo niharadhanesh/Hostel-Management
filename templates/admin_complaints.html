@@ -1,99 +1,302 @@
 {% extends 'admin_base.html' %}
 {% block title %}Complaints{% endblock %}
+{% block page_title %}Complaints{% endblock %}
 
 {% block content %}
 
-<div class="container mt-4">
+<style>
 
-    <div class="card shadow border-0">
-        <div class="card-header bg-danger text-white">
-            <h4 class="mb-0">Student Complaints</h4>
-        </div>
+    .page-head{
+        display:flex;
+        align-items:center;
+        justify-content:space-between;
+        margin-bottom:22px;
+        gap:12px;
+        flex-wrap:wrap;
+    }
 
-        <div class="card-body table-responsive">
+    .section-title{
+        font-family:'Cormorant Garamond', serif;
+        font-size:1.35rem;
+        font-weight:700;
+        color:#f0ece4;
+    }
 
-            <table class="table table-bordered table-hover text-center align-middle">
+    /* ───────────────── TABLE ───────────────── */
 
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Student</th>
-                        <th>Subject</th>
-                        <th>Message</th>
-                        <th>Date</th>
-                        <th>Status</th>
-                        <th>Action</th>
-                    </tr>
-                </thead>
+    .rg-table-wrap{
+        border-radius:16px;
+        overflow-x:auto;
+        border:1px solid rgba(199,147,112,0.18);
+        background:#141d33;
+    }
 
-                <tbody>
+    .rg-table{
+        width:100%;
+        border-collapse:collapse;
+        min-width:950px;
+    }
 
-                    {% for complaint in complaints %}
-                    <tr>
+    .rg-table thead tr{
+        background:rgba(199,147,112,0.18);
+    }
 
-                        <td>{{ forloop.counter }}</td>
+    .rg-table thead th{
+        padding:14px 16px;
+        font-size:0.72rem;
+        font-weight:600;
+        letter-spacing:1.4px;
+        text-transform:uppercase;
+        color:#c7936e;
+        border:none;
+        white-space:nowrap;
+    }
 
-                        <td>
-                            {{ complaint.student.first_name|default:complaint.student.username }}
-                        </td>
+    .rg-table tbody tr{
+        border-bottom:1px solid rgba(255,255,255,0.05);
+        transition:0.2s;
+    }
 
-                        <td>{{ complaint.subject }}</td>
+    .rg-table tbody tr:last-child{
+        border-bottom:none;
+    }
 
-                        <td style="max-width:250px;">
-                            {{ complaint.message }}
-                        </td>
+    .rg-table tbody tr:hover{
+        background:rgba(199,147,112,0.05);
+    }
 
-                        <td>
-                            {{ complaint.created_at|date:"d M Y" }}
-                        </td>
+    .rg-table tbody td{
+        padding:14px 16px;
+        color:#f0ece4;
+        border:none;
+        vertical-align:middle;
+        font-size:0.88rem;
+    }
 
-                        <td>
-                            {% if complaint.status == "Resolved" %}
-                                <span class="badge bg-success px-3 py-2">
-                                    Resolved
-                                </span>
-                            {% else %}
-                                <span class="badge bg-warning text-dark px-3 py-2">
-                                    Pending
-                                </span>
-                            {% endif %}
-                        </td>
+    .student-name{
+        color:#c7936e;
+        font-weight:600;
+    }
 
-                        <td>
+    .message-box{
+        max-width:280px;
+        white-space:normal;
+        line-height:1.5;
+        color:#d7dbe7;
+    }
 
-                            {% if complaint.status == "Pending" %}
-                            <form method="POST">
-                                {% csrf_token %}
-                                <input type="hidden" name="complaint_id" value="{{ complaint.id }}">
+    /* ───────────────── STATUS BADGES ───────────────── */
 
-                                <button class="btn btn-success btn-sm">
-                                    Resolve
-                                </button>
-                            </form>
-                            {% else %}
-                                <span class="text-success fw-bold">
-                                    Done
-                                </span>
-                            {% endif %}
+    .status-badge{
+        display:inline-block;
+        padding:6px 14px;
+        border-radius:20px;
+        font-size:0.75rem;
+        font-weight:600;
+        letter-spacing:0.3px;
+    }
 
-                        </td>
+    .status-resolved{
+        background:rgba(52,211,153,0.12);
+        color:#34d399;
+        border:1px solid rgba(52,211,153,0.24);
+    }
 
-                    </tr>
+    .status-pending{
+        background:rgba(251,191,36,0.12);
+        color:#fbbf24;
+        border:1px solid rgba(251,191,36,0.24);
+    }
 
-                    {% empty %}
-                    <tr>
-                        <td colspan="7" class="text-danger">
-                            No Complaints Found
-                        </td>
-                    </tr>
-                    {% endfor %}
+    /* ───────────────── BUTTONS ───────────────── */
 
-                </tbody>
+    .btn-resolve{
+        background:rgba(52,211,153,0.12);
+        color:#34d399;
+        border:1px solid rgba(52,211,153,0.24);
 
-            </table>
+        padding:7px 15px;
 
-        </div>
-    </div>
+        border-radius:8px;
+
+        font-size:0.78rem;
+        font-weight:600;
+
+        cursor:pointer;
+
+        transition:0.2s;
+    }
+
+    .btn-resolve:hover{
+        background:rgba(52,211,153,0.22);
+        color:#fff;
+    }
+
+    .done-text{
+        color:#34d399;
+        font-weight:700;
+        font-size:0.85rem;
+    }
+
+    /* ───────────────── EMPTY STATE ───────────────── */
+
+    .empty-row td{
+        text-align:center;
+        color:#f87171;
+        font-weight:600;
+        padding:30px;
+    }
+
+    /* ───────────────── MOBILE ───────────────── */
+
+    @media(max-width:768px){
+
+        .section-title{
+            font-size:1.1rem;
+        }
+
+        .rg-table{
+            min-width:850px;
+        }
+
+        .message-box{
+            max-width:220px;
+        }
+
+    }
+
+</style>
+
+<!-- ───────────────── HEADER ───────────────── -->
+
+<div class="page-head">
+
+    <span class="section-title">
+        Student Complaints
+    </span>
+
+</div>
+
+<!-- ───────────────── TABLE ───────────────── -->
+
+<div class="rg-table-wrap">
+
+    <table class="rg-table">
+
+        <thead>
+
+            <tr>
+                <th>#</th>
+                <th>Student</th>
+                <th>Subject</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th>Action</th>
+            </tr>
+
+        </thead>
+
+        <tbody>
+
+            {% for complaint in complaints %}
+
+            <tr>
+
+                <td>{{ forloop.counter }}</td>
+
+                <td class="student-name">
+
+                    {{ complaint.student.first_name|default:complaint.student.username }}
+
+                </td>
+
+                <td>
+
+                    {{ complaint.subject }}
+
+                </td>
+
+                <td>
+
+                    <div class="message-box">
+                        {{ complaint.message }}
+                    </div>
+
+                </td>
+
+                <td>
+
+                    {{ complaint.created_at|date:"d M Y" }}
+
+                </td>
+
+                <td>
+
+                    {% if complaint.status == "Resolved" %}
+
+                        <span class="status-badge status-resolved">
+                            Resolved
+                        </span>
+
+                    {% else %}
+
+                        <span class="status-badge status-pending">
+                            Pending
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+                <td>
+
+                    {% if complaint.status == "Pending" %}
+
+                    <form method="POST">
+
+                        {% csrf_token %}
+
+                        <input type="hidden"
+                               name="complaint_id"
+                               value="{{ complaint.id }}">
+
+                        <button type="submit"
+                                class="btn-resolve">
+
+                            Resolve
+
+                        </button>
+
+                    </form>
+
+                    {% else %}
+
+                        <span class="done-text">
+                            Done
+                        </span>
+
+                    {% endif %}
+
+                </td>
+
+            </tr>
+
+            {% empty %}
+
+            <tr class="empty-row">
+
+                <td colspan="7">
+                    No Complaints Found
+                </td>
+
+            </tr>
+
+            {% endfor %}
+
+        </tbody>
+
+    </table>
 
 </div>
 
