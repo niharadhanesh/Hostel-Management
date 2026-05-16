@@ -1,109 +1,513 @@
 <!-- templates/rent_status.html -->
 
 {% extends 'student_base.html' %}
+
 {% block title %}Rent Status{% endblock %}
 
 {% block content %}
 
-<div class="container mt-4">
+<style>
 
-    {% if notified %}
-    <div class="alert alert-warning shadow-sm">
-        <strong>Reminder:</strong> Please pay your hostel rent as soon as possible.
+    .page-title{
+        font-family:'Cormorant Garamond', serif;
+        font-size:2rem;
+        font-weight:700;
+        color:#f0ece4;
+        margin-bottom:28px;
+    }
+
+    /* ───────────────── ALERT ───────────────── */
+
+    .custom-alert{
+        background:rgba(251,191,36,0.10);
+
+        border:1px solid rgba(251,191,36,0.22);
+
+        color:#fbbf24;
+
+        border-radius:16px;
+
+        padding:16px 18px;
+
+        margin-bottom:24px;
+
+        backdrop-filter:blur(10px);
+
+        box-shadow:
+            0 8px 24px rgba(0,0,0,0.18);
+    }
+
+    /* ───────────────── INFO CARD ───────────────── */
+
+    .rent-info-card{
+        background:rgba(255,255,255,0.03);
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        border-radius:22px;
+
+        padding:28px;
+
+        margin-bottom:30px;
+
+        backdrop-filter:blur(12px);
+
+        box-shadow:
+            0 10px 35px rgba(0,0,0,0.20);
+    }
+
+    .rent-info-title{
+        font-family:'Cormorant Garamond', serif;
+
+        font-size:1.6rem;
+
+        font-weight:700;
+
+        color:#34d399;
+
+        margin-bottom:24px;
+    }
+
+    .info-box{
+        background:rgba(199,147,112,0.06);
+
+        border:1px solid rgba(199,147,112,0.12);
+
+        border-radius:18px;
+
+        padding:22px 18px;
+
+        height:100%;
+
+        transition:0.25s ease;
+    }
+
+    .info-box:hover{
+        transform:translateY(-3px);
+
+        background:rgba(199,147,112,0.10);
+    }
+
+    .info-label{
+        color:#7c8ba3;
+
+        font-size:0.78rem;
+
+        text-transform:uppercase;
+
+        letter-spacing:1px;
+
+        margin-bottom:10px;
+
+        font-weight:600;
+    }
+
+    .info-value{
+        color:#f0ece4;
+
+        font-size:1.3rem;
+
+        font-weight:700;
+    }
+
+    .room-number{
+        color:#c7936e;
+    }
+
+    .rent-price{
+        color:#34d399;
+    }
+
+    .no-room{
+        background:rgba(248,113,113,0.08);
+
+        border:1px solid rgba(248,113,113,0.18);
+
+        color:#f87171;
+
+        padding:16px 18px;
+
+        border-radius:14px;
+    }
+
+    /* ───────────────── TABLE CARD ───────────────── */
+
+    .table-card{
+        background:rgba(255,255,255,0.03);
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        border-radius:22px;
+
+        overflow:hidden;
+
+        backdrop-filter:blur(12px);
+
+        box-shadow:
+            0 10px 35px rgba(0,0,0,0.20);
+    }
+
+    .table-header{
+        padding:22px 26px;
+
+        border-bottom:1px solid rgba(255,255,255,0.06);
+
+        background:rgba(199,147,112,0.06);
+    }
+
+    .table-header h5{
+        margin:0;
+
+        font-family:'Cormorant Garamond', serif;
+
+        font-size:1.45rem;
+
+        font-weight:700;
+
+        color:#f0ece4;
+    }
+
+    /* ───────────────── TABLE ───────────────── */
+
+    .table-wrap{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .custom-table{
+        width:100%;
+        min-width:760px;
+
+        border-collapse:collapse;
+    }
+
+    .custom-table thead tr{
+        background:rgba(199,147,112,0.12);
+    }
+
+    .custom-table thead th{
+        padding:15px 18px;
+
+        color:#c7936e;
+
+        font-size:0.74rem;
+
+        font-weight:600;
+
+        text-transform:uppercase;
+
+        letter-spacing:1.5px;
+
+        border:none;
+
+        text-align:center;
+
+        white-space:nowrap;
+    }
+
+    .custom-table tbody tr{
+        border-bottom:1px solid rgba(255,255,255,0.05);
+
+        transition:0.2s ease;
+    }
+
+    .custom-table tbody tr:hover{
+        background:rgba(199,147,112,0.05);
+    }
+
+    .custom-table tbody td{
+        padding:16px 18px;
+
+        color:#f0ece4;
+
+        text-align:center;
+
+        border:none;
+
+        white-space:nowrap;
+    }
+
+    .custom-table tbody tr:last-child{
+        border-bottom:none;
+    }
+
+    /* ───────────────── BADGES ───────────────── */
+
+    .badge-paid{
+        display:inline-block;
+
+        background:rgba(52,211,153,0.12);
+
+        color:#34d399;
+
+        border:1px solid rgba(52,211,153,0.25);
+
+        border-radius:30px;
+
+        padding:6px 14px;
+
+        font-size:0.75rem;
+
+        font-weight:600;
+    }
+
+    .badge-pending{
+        display:inline-block;
+
+        background:rgba(248,113,113,0.10);
+
+        color:#f87171;
+
+        border:1px solid rgba(248,113,113,0.22);
+
+        border-radius:30px;
+
+        padding:6px 14px;
+
+        font-size:0.75rem;
+
+        font-weight:600;
+    }
+
+    .muted-text{
+        color:#7c8ba3;
+    }
+
+    /* ───────────────── MOBILE ───────────────── */
+
+    @media(max-width:768px){
+
+        .page-title{
+            font-size:1.7rem;
+        }
+
+        .rent-info-card{
+            padding:22px 18px;
+        }
+
+        .rent-info-title{
+            font-size:1.4rem;
+        }
+
+        .table-header{
+            padding:18px;
+        }
+
+        .table-header h5{
+            font-size:1.25rem;
+        }
+
+        .custom-table thead th{
+            padding:13px 14px;
+            font-size:0.68rem;
+        }
+
+        .custom-table tbody td{
+            padding:13px 14px;
+            font-size:0.82rem;
+        }
+
+        .info-box{
+            padding:18px 16px;
+        }
+
+        .info-value{
+            font-size:1.1rem;
+        }
+    }
+
+</style>
+
+<h2 class="page-title">
+    Rent Status
+</h2>
+
+{% if notified %}
+
+<div class="custom-alert">
+
+    <strong>Reminder:</strong>
+
+    Please pay your hostel rent as soon as possible.
+
+</div>
+
+{% endif %}
+
+<!-- ───────────────── RENT INFO ───────────────── -->
+
+<div class="rent-info-card">
+
+    <h3 class="rent-info-title">
+        My Rent Details
+    </h3>
+
+    {% if room %}
+
+    <div class="row g-4">
+
+        <div class="col-md-4">
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Room Number
+                </div>
+
+                <div class="info-value room-number">
+                    {{ room.room_number }}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Room Type
+                </div>
+
+                <div class="info-value">
+                    {{ room.room_type }}
+                </div>
+
+            </div>
+
+        </div>
+
+        <div class="col-md-4">
+
+            <div class="info-box">
+
+                <div class="info-label">
+                    Monthly Rent
+                </div>
+
+                <div class="info-value rent-price">
+                    ₹ {{ room.rent }}
+                </div>
+
+            </div>
+
+        </div>
+
     </div>
+
+    {% else %}
+
+    <div class="no-room">
+        No Room Assigned Yet
+    </div>
+
     {% endif %}
 
-    <!-- Top Card -->
-    <div class="card shadow border-0 mb-4">
-        <div class="card-body">
-            <h2 class="text-success mb-3">My Rent Details</h2>
+</div>
 
-            {% if room %}
-            <div class="row">
+<!-- ───────────────── RENT HISTORY ───────────────── -->
 
-                <div class="col-md-4">
-                    <div class="alert alert-primary">
-                        <strong>Room No:</strong> {{ room.room_number }}
-                    </div>
-                </div>
+<div class="table-card">
 
-                <div class="col-md-4">
-                    <div class="alert alert-info">
-                        <strong>Room Type:</strong> {{ room.room_type }}
-                    </div>
-                </div>
+    <div class="table-header">
 
-                <div class="col-md-4">
-                    <div class="alert alert-success">
-                        <strong>Monthly Rent:</strong> ₹ {{ room.rent }}
-                    </div>
-                </div>
+        <h5>
+            Current Rent Status
+        </h5>
 
-            </div>
-            {% else %}
-            <div class="alert alert-danger">
-                No Room Assigned Yet
-            </div>
-            {% endif %}
-        </div>
     </div>
 
+    <div class="table-wrap">
 
-    <!-- Rent Table -->
-    <div class="card shadow border-0">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Current Rent Status</h5>
-        </div>
+        <table class="custom-table">
 
-        <div class="card-body table-responsive">
+            <thead>
 
-            <table class="table table-bordered table-hover text-center align-middle">
+                <tr>
+                    <th>#</th>
+                    <th>Month</th>
+                    <th>Total Rent</th>
+                    <th>Paid</th>
+                    <th>Balance</th>
+                    <th>Status</th>
+                    <th>Paid Date</th>
+                </tr>
 
-                <thead class="table-dark">
-                    <tr>
-                        <th>#</th>
-                        <th>Month</th>
-                        <th>Total Rent</th>
-                        <th>Paid</th>
-                        <th>Balance</th>
-                        <th>Status</th>
-                        <th>Paid Date</th>
-                    </tr>
-                </thead>
+            </thead>
 
-                <tbody>
+            <tbody>
 
-                    {% for rent in rent_history %}
-                    <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ rent.month }}</td>
-                        <td>₹ {{ rent.amount }}</td>
-                        <td>₹ {{ rent.paid }}</td>
-                        <td>₹ {{ rent.balance }}</td>
+                {% for rent in rent_history %}
 
-                        <td>
-                            {% if rent.status == "Paid" %}
-                            <span class="badge bg-success px-3 py-2">Paid</span>
-                            {% else %}
-                            <span class="badge bg-danger px-3 py-2">Pending</span>
-                            {% endif %}
-                        </td>
+                <tr>
 
-                        <td>
-                            {% if rent.paid_date %}
-                                {{ rent.paid_date }}
-                            {% else %}
+                    <td>{{ forloop.counter }}</td>
+
+                    <td>{{ rent.month }}</td>
+
+                    <td>₹ {{ rent.amount }}</td>
+
+                    <td>₹ {{ rent.paid }}</td>
+
+                    <td>₹ {{ rent.balance }}</td>
+
+                    <td>
+
+                        {% if rent.status == "Paid" %}
+
+                        <span class="badge-paid">
+                            Paid
+                        </span>
+
+                        {% else %}
+
+                        <span class="badge-pending">
+                            Pending
+                        </span>
+
+                        {% endif %}
+
+                    </td>
+
+                    <td>
+
+                        {% if rent.paid_date %}
+
+                            {{ rent.paid_date }}
+
+                        {% else %}
+
+                            <span class="muted-text">
                                 --
-                            {% endif %}
-                        </td>
-                    </tr>
-                    {% endfor %}
+                            </span>
 
-                </tbody>
+                        {% endif %}
 
-            </table>
+                    </td>
 
-        </div>
+                </tr>
+
+                {% empty %}
+
+                <tr>
+
+                    <td colspan="7"
+                        class="muted-text"
+                        style="padding:28px;">
+
+                        No Rent History Found
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
     </div>
 
 </div>

@@ -3,48 +3,374 @@
 
 {% block content %}
 
-<div class="container mt-4">
+<style>
 
-    <!-- ADD COMPLAINT -->
-    <div class="card shadow border-0 mb-4">
-        <div class="card-header bg-danger text-white">
-            <h5 class="mb-0">Raise Complaint</h5>
-        </div>
+    .page-title{
+        font-family:'Cormorant Garamond', serif;
+        font-size:2rem;
+        font-weight:700;
+        color:#f0ece4;
+        margin-bottom:28px;
+    }
 
-        <div class="card-body">
+    /* ───────────────── CARD ───────────────── */
 
-            <form method="POST">
-                {% csrf_token %}
+    .glass-card{
+        background:rgba(255,255,255,0.03);
 
-                <input type="text" name="subject"
-                       class="form-control mb-3"
-                       placeholder="Complaint Subject" required>
+        border:1px solid rgba(255,255,255,0.08);
 
-                <textarea name="message"
-                          class="form-control mb-3"
-                          rows="4"
-                          placeholder="Describe your issue..." required></textarea>
+        border-radius:22px;
 
-                <button class="btn btn-danger">
-                    Submit Complaint
-                </button>
-            </form>
+        overflow:hidden;
 
-        </div>
+        margin-bottom:30px;
+
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+
+        box-shadow:
+            0 10px 35px rgba(0,0,0,0.20);
+    }
+
+    .glass-header{
+        padding:22px 26px;
+
+        background:rgba(199,147,112,0.06);
+
+        border-bottom:1px solid rgba(255,255,255,0.06);
+    }
+
+    .glass-header h5{
+        margin:0;
+
+        font-family:'Cormorant Garamond', serif;
+
+        font-size:1.45rem;
+
+        font-weight:700;
+
+        color:#f0ece4;
+    }
+
+    .glass-body{
+        padding:26px;
+    }
+
+    /* ───────────────── FORM ───────────────── */
+
+    .form-label{
+        color:#7c8ba3;
+
+        font-size:0.8rem;
+
+        margin-bottom:8px;
+
+        font-weight:500;
+    }
+
+    .custom-input,
+    .custom-textarea{
+        width:100%;
+
+        background:rgba(255,255,255,0.04);
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        border-radius:14px;
+
+        padding:14px 16px;
+
+        color:#f0ece4;
+
+        font-size:0.92rem;
+
+        outline:none;
+
+        transition:0.25s ease;
+    }
+
+    .custom-input::placeholder,
+    .custom-textarea::placeholder{
+        color:#7c8ba3;
+    }
+
+    .custom-input:focus,
+    .custom-textarea:focus{
+        border-color:rgba(199,147,112,0.35);
+
+        background:rgba(255,255,255,0.06);
+
+        box-shadow:
+            0 0 0 4px rgba(199,147,112,0.10);
+    }
+
+    .custom-textarea{
+        resize:none;
+        min-height:140px;
+    }
+
+    .submit-btn{
+        background:#c7936e;
+
+        color:#0e1526;
+
+        border:none;
+
+        padding:12px 24px;
+
+        border-radius:12px;
+
+        font-weight:700;
+
+        font-size:0.9rem;
+
+        transition:0.25s ease;
+    }
+
+    .submit-btn:hover{
+        background:#b07a57;
+
+        transform:translateY(-2px);
+    }
+
+    /* ───────────────── TABLE ───────────────── */
+
+    .table-wrap{
+        overflow-x:auto;
+        -webkit-overflow-scrolling:touch;
+    }
+
+    .custom-table{
+        width:100%;
+
+        min-width:700px;
+
+        border-collapse:collapse;
+    }
+
+    .custom-table thead tr{
+        background:rgba(199,147,112,0.10);
+    }
+
+    .custom-table thead th{
+        padding:15px 18px;
+
+        color:#c7936e;
+
+        font-size:0.74rem;
+
+        font-weight:600;
+
+        text-transform:uppercase;
+
+        letter-spacing:1.5px;
+
+        text-align:center;
+
+        border:none;
+
+        white-space:nowrap;
+    }
+
+    .custom-table tbody tr{
+        border-bottom:1px solid rgba(255,255,255,0.05);
+
+        transition:0.2s ease;
+    }
+
+    .custom-table tbody tr:hover{
+        background:rgba(199,147,112,0.05);
+    }
+
+    .custom-table tbody td{
+        padding:16px 18px;
+
+        color:#f0ece4;
+
+        text-align:center;
+
+        border:none;
+
+        white-space:nowrap;
+    }
+
+    .custom-table tbody tr:last-child{
+        border-bottom:none;
+    }
+
+    .message-cell{
+        max-width:280px;
+
+        white-space:normal !important;
+
+        line-height:1.5;
+
+        color:#d9dce3;
+    }
+
+    /* ───────────────── BADGES ───────────────── */
+
+    .badge-resolved{
+        display:inline-block;
+
+        background:rgba(52,211,153,0.12);
+
+        color:#34d399;
+
+        border:1px solid rgba(52,211,153,0.25);
+
+        border-radius:30px;
+
+        padding:6px 14px;
+
+        font-size:0.75rem;
+
+        font-weight:600;
+    }
+
+    .badge-pending{
+        display:inline-block;
+
+        background:rgba(251,191,36,0.10);
+
+        color:#fbbf24;
+
+        border:1px solid rgba(251,191,36,0.20);
+
+        border-radius:30px;
+
+        padding:6px 14px;
+
+        font-size:0.75rem;
+
+        font-weight:600;
+    }
+
+    .empty-text{
+        color:#7c8ba3;
+
+        padding:28px !important;
+
+        font-style:italic;
+    }
+
+    /* ───────────────── MOBILE ───────────────── */
+
+    @media(max-width:768px){
+
+        .page-title{
+            font-size:1.7rem;
+        }
+
+        .glass-header{
+            padding:18px;
+        }
+
+        .glass-header h5{
+            font-size:1.25rem;
+        }
+
+        .glass-body{
+            padding:20px 18px;
+        }
+
+        .custom-table thead th{
+            padding:13px 14px;
+            font-size:0.68rem;
+        }
+
+        .custom-table tbody td{
+            padding:13px 14px;
+            font-size:0.82rem;
+        }
+
+        .submit-btn{
+            width:100%;
+        }
+    }
+
+</style>
+
+<h2 class="page-title">
+    Complaints
+</h2>
+
+<!-- ───────────────── RAISE COMPLAINT ───────────────── -->
+
+<div class="glass-card">
+
+    <div class="glass-header">
+
+        <h5>
+            Raise Complaint
+        </h5>
+
     </div>
 
+    <div class="glass-body">
 
-    <!-- COMPLAINT LIST -->
-    <div class="card shadow border-0">
-        <div class="card-header bg-dark text-white">
-            <h5 class="mb-0">My Complaints</h5>
-        </div>
+        <form method="POST">
 
-        <div class="card-body table-responsive">
+            {% csrf_token %}
 
-            <table class="table table-bordered table-hover text-center">
+            <div class="mb-3">
 
-                <thead class="table-secondary">
+                <label class="form-label">
+                    Subject
+                </label>
+
+                <input type="text"
+                       name="subject"
+                       class="custom-input"
+                       placeholder="Complaint Subject"
+                       required>
+
+            </div>
+
+            <div class="mb-4">
+
+                <label class="form-label">
+                    Message
+                </label>
+
+                <textarea name="message"
+                          class="custom-textarea"
+                          placeholder="Describe your issue..."
+                          required></textarea>
+
+            </div>
+
+            <button class="submit-btn">
+                Submit Complaint
+            </button>
+
+        </form>
+
+    </div>
+
+</div>
+
+<!-- ───────────────── COMPLAINT LIST ───────────────── -->
+
+<div class="glass-card">
+
+    <div class="glass-header">
+
+        <h5>
+            My Complaints
+        </h5>
+
+    </div>
+
+    <div class="glass-body">
+
+        <div class="table-wrap">
+
+            <table class="custom-table">
+
+                <thead>
+
                     <tr>
                         <th>#</th>
                         <th>Subject</th>
@@ -52,39 +378,64 @@
                         <th>Status</th>
                         <th>Date</th>
                     </tr>
+
                 </thead>
 
                 <tbody>
 
                     {% for complaint in complaints %}
+
                     <tr>
-                        <td>{{ forloop.counter }}</td>
-                        <td>{{ complaint.subject }}</td>
-                        <td>{{ complaint.message }}</td>
 
                         <td>
+                            {{ forloop.counter }}
+                        </td>
+
+                        <td>
+                            {{ complaint.subject }}
+                        </td>
+
+                        <td class="message-cell">
+                            {{ complaint.message }}
+                        </td>
+
+                        <td>
+
                             {% if complaint.status == "Resolved" %}
-                                <span class="badge bg-success">
+
+                                <span class="badge-resolved">
                                     Resolved
                                 </span>
+
                             {% else %}
-                                <span class="badge bg-warning text-dark">
+
+                                <span class="badge-pending">
                                     Pending
                                 </span>
+
                             {% endif %}
+
                         </td>
 
                         <td>
                             {{ complaint.created_at|date:"d M Y" }}
                         </td>
+
                     </tr>
 
                     {% empty %}
+
                     <tr>
-                        <td colspan="5" class="text-danger">
+
+                        <td colspan="5"
+                            class="empty-text">
+
                             No complaints submitted
+
                         </td>
+
                     </tr>
+
                     {% endfor %}
 
                 </tbody>
@@ -92,6 +443,7 @@
             </table>
 
         </div>
+
     </div>
 
 </div>

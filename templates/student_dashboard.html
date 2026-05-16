@@ -6,42 +6,457 @@
 
 {% block content %}
 
-<h2 class="mb-4 fw-bold">Student Dashboard</h2>
+<style>
+
+    .dashboard-title{
+        font-family:'Cormorant Garamond', serif;
+        font-size:2rem;
+        font-weight:700;
+        color:#f0ece4;
+        margin-bottom:28px;
+    }
+
+    /* ───────────────── CARDS ───────────────── */
+
+    .dash-card{
+        position:relative;
+
+        background:rgba(255,255,255,0.03);
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        border-radius:22px;
+
+        padding:28px 24px;
+
+        overflow:hidden;
+
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+
+        transition:0.25s ease;
+
+        height:100%;
+
+        box-shadow:
+            0 10px 30px rgba(0,0,0,0.20);
+    }
+
+    .dash-card:hover{
+        transform:translateY(-4px);
+
+        border-color:rgba(199,147,112,0.22);
+
+        box-shadow:
+            0 16px 40px rgba(0,0,0,0.28);
+    }
+
+    .dash-card::before{
+        content:'';
+
+        position:absolute;
+
+        width:120px;
+        height:120px;
+
+        border-radius:50%;
+
+        background:rgba(199,147,112,0.08);
+
+        top:-45px;
+        right:-45px;
+    }
+
+    .card-label{
+        color:#7c8ba3;
+
+        font-size:0.82rem;
+
+        text-transform:uppercase;
+
+        letter-spacing:1.5px;
+
+        font-weight:600;
+
+        margin-bottom:14px;
+    }
+
+    .card-value{
+        font-size:2rem;
+
+        font-weight:700;
+
+        margin-bottom:8px;
+
+        line-height:1.1;
+    }
+
+    .card-sub{
+        font-size:0.85rem;
+
+        color:#9aa8bf;
+    }
+
+    .room-text{
+        color:#c7936e;
+    }
+
+    .paid-text{
+        color:#34d399;
+    }
+
+    .complaint-text{
+        color:#f87171;
+    }
+
+    /* ───────────────── NOTICE BOX ───────────────── */
+
+    .notice-box{
+        margin-top:34px;
+
+        background:rgba(255,255,255,0.03);
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        border-radius:22px;
+
+        padding:28px;
+
+        backdrop-filter:blur(12px);
+        -webkit-backdrop-filter:blur(12px);
+
+        box-shadow:
+            0 10px 30px rgba(0,0,0,0.20);
+    }
+
+    .notice-title{
+        font-family:'Cormorant Garamond', serif;
+
+        font-size:1.5rem;
+
+        font-weight:700;
+
+        color:#f0ece4;
+
+        margin-bottom:22px;
+    }
+
+    .notice-list{
+        display:flex;
+        flex-direction:column;
+        gap:14px;
+    }
+
+    .notice-item{
+        display:flex;
+
+        align-items:flex-start;
+
+        gap:14px;
+
+        padding:16px 18px;
+
+        border-radius:14px;
+
+        background:rgba(199,147,112,0.06);
+
+        border:1px solid rgba(199,147,112,0.08);
+
+        transition:0.2s ease;
+    }
+
+    .notice-item:hover{
+        background:rgba(199,147,112,0.10);
+
+        transform:translateX(2px);
+    }
+
+    .notice-dot{
+        width:10px;
+        height:10px;
+
+        min-width:10px;
+
+        border-radius:50%;
+
+        background:#c7936e;
+
+        margin-top:6px;
+    }
+
+    .notice-text{
+        color:#f0ece4;
+
+        font-size:0.92rem;
+
+        line-height:1.5;
+    }
+
+    .notice-date{
+        display:block;
+
+        margin-top:5px;
+
+        color:#7c8ba3;
+
+        font-size:0.76rem;
+    }
+
+    /* ───────────────── QUICK INFO ───────────────── */
+
+    .mini-info{
+        margin-top:30px;
+    }
+
+    .info-card{
+        background:rgba(255,255,255,0.03);
+
+        border:1px solid rgba(255,255,255,0.08);
+
+        border-radius:18px;
+
+        padding:20px;
+
+        text-align:center;
+
+        height:100%;
+    }
+
+    .info-label{
+        color:#7c8ba3;
+
+        font-size:0.78rem;
+
+        margin-bottom:8px;
+    }
+
+    .info-value{
+        color:#f0ece4;
+
+        font-weight:700;
+
+        font-size:1.1rem;
+    }
+
+    /* ───────────────── MOBILE ───────────────── */
+
+    @media(max-width:768px){
+
+        .dashboard-title{
+            font-size:1.7rem;
+        }
+
+        .dash-card{
+            padding:22px 20px;
+        }
+
+        .card-value{
+            font-size:1.7rem;
+        }
+
+        .notice-box{
+            padding:22px 18px;
+        }
+
+        .notice-title{
+            font-size:1.3rem;
+        }
+
+        .notice-item{
+            padding:14px;
+        }
+    }
+
+</style>
+
+<h2 class="dashboard-title">
+    Student Dashboard
+</h2>
 
 <div class="row g-4">
 
-    <div class="col-md-4">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>My Room</h6>
-            <h2 class="fw-bold text-primary">A-203</h2>
+    <!-- ROOM -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="dash-card">
+
+            <div class="card-label">
+                My Room
+            </div>
+
+            <div class="card-value room-text">
+                A-203
+            </div>
+
+            <div class="card-sub">
+                Allocated hostel room
+            </div>
+
         </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>Rent Status</h6>
-            <h2 class="fw-bold text-success">Paid</h2>
+    <!-- RENT -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="dash-card">
+
+            <div class="card-label">
+                Rent Status
+            </div>
+
+            <div class="card-value paid-text">
+                Paid
+            </div>
+
+            <div class="card-sub">
+                Updated this month
+            </div>
+
         </div>
+
     </div>
 
-    <div class="col-md-4">
-        <div class="card shadow border-0 rounded-4 p-4 text-center">
-            <h6>Complaints</h6>
-            <h2 class="fw-bold text-danger">1</h2>
+    <!-- COMPLAINT -->
+
+    <div class="col-lg-4 col-md-6">
+
+        <div class="dash-card">
+
+            <div class="card-label">
+                Complaints
+            </div>
+
+            <div class="card-value complaint-text">
+                1
+            </div>
+
+            <div class="card-sub">
+                Active complaint request
+            </div>
+
         </div>
+
     </div>
 
 </div>
 
-<div class="mt-5">
-    <div class="card shadow border-0 rounded-4 p-4">
-        <h5 class="mb-3">Latest Notices</h5>
-        <ul class="list-group list-group-flush">
-            <li class="list-group-item">Water supply maintenance tomorrow</li>
-            <li class="list-group-item">Rent due date is 5th of every month</li>
-            <li class="list-group-item">Mess timing updated</li>
-        </ul>
+<!-- ───────────────── NOTICES ───────────────── -->
+
+<div class="notice-box">
+
+    <h4 class="notice-title">
+        Latest Notices
+    </h4>
+
+    <div class="notice-list">
+
+        <div class="notice-item">
+
+            <div class="notice-dot"></div>
+
+            <div class="notice-text">
+
+                Water supply maintenance tomorrow from 10 AM to 1 PM.
+
+                <span class="notice-date">
+                    Posted Today
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="notice-item">
+
+            <div class="notice-dot"></div>
+
+            <div class="notice-text">
+
+                Rent due date is 5th of every month. Kindly pay before deadline.
+
+                <span class="notice-date">
+                    Updated Yesterday
+                </span>
+
+            </div>
+
+        </div>
+
+        <div class="notice-item">
+
+            <div class="notice-dot"></div>
+
+            <div class="notice-text">
+
+                Mess timing updated for weekends and holidays.
+
+                <span class="notice-date">
+                    2 Days Ago
+                </span>
+
+            </div>
+
+        </div>
+
     </div>
+
+</div>
+
+<!-- ───────────────── QUICK INFO ───────────────── -->
+
+<div class="row g-4 mini-info">
+
+    <div class="col-md-4">
+
+        <div class="info-card">
+
+            <div class="info-label">
+                Hostel Block
+            </div>
+
+            <div class="info-value">
+                Block A
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="info-card">
+
+            <div class="info-label">
+                Room Type
+            </div>
+
+            <div class="info-value">
+                Double Sharing
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="col-md-4">
+
+        <div class="info-card">
+
+            <div class="info-label">
+                Attendance
+            </div>
+
+            <div class="info-value">
+                96%
+            </div>
+
+        </div>
+
+    </div>
+
 </div>
 
 {% endblock %}
